@@ -1,4 +1,7 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
+import hospitalTable from '../app/schema/table_hospital';
+import logisticalTable from '../app/schema/table_logistical';
+import hotelTable from '../app/schema/table_hotel';
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -17,17 +20,21 @@ export default (appInfo: EggAppInfo) => {
     },
   };
 
-  config.schedule = {
-    update_shimo: {
-      interval: '1m',
-    },
-  };
-
-  config.github = {
+  const githubConfig = {
     token: 'YOUR TOKEN',
     owner: 'wuhan2020',
     repo: 'wuhan2020-test',
     message: 'data-sync',
+    tables: [ hospitalTable, logisticalTable, hotelTable ],
+  };
+
+  config.github = githubConfig;
+
+  config.shimo = {
+    username: 'YOUR USERNAME',
+    password: 'YOUR PASSWORD',
+    clientId: 'YOUR CLIENT ID',
+    clientSecret: 'YOUR CLIENT SECRET',
   };
 
   // add your special config in here

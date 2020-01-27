@@ -1,16 +1,38 @@
 import { Service } from 'egg';
 import * as Octokit from '@octokit/rest';
 import * as moment from 'moment';
+import { Table } from '../schema/table';
+import { ShimoSheetFetcher } from 'shimo-sheet2json';
 
 export default class GithubService extends Service {
-  async test() {
-    const myPath = 'test2.yaml';
-    await this.updateRepo(myPath, '');
+
+  public async update() {
+    const { config, logger } = this.ctx.app;
+    const shimoFetcher = new ShimoSheetFetcher(config.shimo);
+    const tables: Table[] = config.github.tables;
+
+    for (const table of tables) {
+      for (const sheet of table.sheets) {
+        try {
+          logger.info(`Gonna get data from shimo, table=${table.name}, sheet=${sheet}`);
+          let data = await shimoFetcher.getFileData({
+            guid: table.guid,
+            sheetName: sheet,
+            skipHead: table.skipHead,
+            columns: table.columns,
+          });
+          data = data.filter((item: any) => item['审核状态'] !== null);
+          await this.updateRepo(`data/json/${table.name}/${sheet}.json`, JSON.stringify(data));
+        } catch (e) {
+          logger.error(e);
+        }
+      }
+    }
   }
-  async updateRepo(path: string, str: string) {
+
+  private async updateRepo(path: string, str: string) {
     const { ctx, logger } = this;
-    const { config } = ctx.app;
-    const { github } = config;
+    const github = ctx.app.config.github;
     const octokit = new Octokit({
       auth: github.token,
     });
@@ -19,8 +41,7 @@ export default class GithubService extends Service {
       repo: github.repo,
     };
     const time = moment().format();
-    const content = `${time}\n${str}`;
-    let sha;
+    let sha = '';
 
     try {
       const res = await octokit.repos.getContents({
@@ -29,13 +50,14 @@ export default class GithubService extends Service {
       });
       sha = (res.data as any).sha;
     } catch (err) {
-      if (err.name === 'HttpError') { logger.error(`${path} is not exist.`); } else { throw err; }
+      if (err.name !== 'HttpError') { throw err; }
     }
+    logger.info(`Goona update file ${path}`);
     await octokit.repos.createOrUpdateFile({
       ...options,
       path,
       message: `[${github.message}] ${time}`,
-      content: Buffer.from(content).toString('base64'),
+      content: Buffer.from(str).toString('base64'),
       sha,
     });
   }
