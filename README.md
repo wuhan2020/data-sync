@@ -1,6 +1,6 @@
-# hackernews-async-ts
+# data-sync
 
-[Hacker News](https://news.ycombinator.com/) showcase using typescript && egg
+using typescript && egg
 
 ## QuickStart
 
