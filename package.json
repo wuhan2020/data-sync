@@ -25,6 +25,7 @@
     "@octokit/rest": "^16.38.3",
     "egg": "^2.6.1",
     "egg-scripts": "^2.6.0",
+    "moment": "^2.24.0",
     "shimo-sheet2json": "^1.0.4"
   },
   "devDependencies": {

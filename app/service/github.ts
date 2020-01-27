@@ -1,37 +1,41 @@
 import { Service } from 'egg';
 import * as Octokit from '@octokit/rest';
+import * as moment from 'moment';
 
 export default class GithubService extends Service {
-  async updateRepo() {
+  async test() {
+    const myPath = 'test2.yaml';
+    await this.updateRepo(myPath, '');
+  }
+  async updateRepo(path: string, str: string) {
     const { ctx } = this;
     const { config } = ctx.app;
     const { github } = config;
-
     const octokit = new Octokit({
       auth: github.token,
     });
-
     const options = {
       owner: github.owner,
       repo: github.repo,
     };
-
-    const myPath = 'test2.yaml';
+    const time = moment().format();
+    const content = `${time}\n${str}`;
     let sha;
-    const content = Date.now().toString();
+
     try {
       const res = await octokit.repos.getContents({
         ...options,
-        path: myPath,
+        path,
       });
       sha = (res.data as any).sha;
     } catch (err) {
-      if (err.name === 'RequestError') { console.log(myPath + 'is not exist.'); } else { throw err; }
+      console.log(err);
+      if (err.name === 'HttpError') { console.log(`${path} is not exist.`); } else { throw err; }
     }
     await octokit.repos.createOrUpdateFile({
       ...options,
-      path: myPath,
-      message: github.message,
+      path,
+      message: `[${github.message}] ${time}`,
       content: Buffer.from(content).toString('base64'),
       sha,
     });

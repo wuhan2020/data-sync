@@ -9,6 +9,6 @@ export default class UpdateShimo extends Subscription {
   }
   async subscribe() {
     const { ctx } = this;
-    await ctx.service.github.updateRepo();
+    await ctx.service.github.test();
   }
 }
