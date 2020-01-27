@@ -22,7 +22,10 @@ export default class GithubService extends Service {
             columns: table.columns,
           });
           data = data.filter((item: any) => item['审核状态'] !== null);
-          await this.updateRepo(`data/json/${table.name}/${sheet}.json`, JSON.stringify(data));
+          if (data.length > 0) {
+            // only update if have data
+            await this.updateRepo(`data/json/${table.name}/${sheet}.json`, JSON.stringify(data));
+          }
         } catch (e) {
           logger.error(e);
         }
