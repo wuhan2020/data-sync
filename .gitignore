@@ -9,6 +9,7 @@ logs/
 .vscode
 *.swp
 *.lock
+package-lock.json
 *.js
 !.autod.conf.js
 
@@ -19,4 +20,5 @@ app/**/*.map
 test/**/*.map
 config/**/*.map
 
-config/config.local.ts
+!config/config.default.ts
+config/config.*.ts

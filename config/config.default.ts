@@ -25,7 +25,7 @@ export default (appInfo: EggAppInfo) => {
     owner: 'wuhan2020',
     repo: 'wuhan2020-test',
     message: 'data-sync',
-    tables: [ hospitalTable, logisticalTable, hotelTable ],
+    tables: [hospitalTable, logisticalTable, hotelTable],
   };
 
   config.github = githubConfig;
@@ -37,14 +37,8 @@ export default (appInfo: EggAppInfo) => {
     clientSecret: 'YOUR CLIENT SECRET',
   };
 
-  // add your special config in here
-  const bizConfig = {
-    sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
-  };
-
   // the return config will combines to EggAppConfig
   return {
     ...config,
-    ...bizConfig,
   };
 };
