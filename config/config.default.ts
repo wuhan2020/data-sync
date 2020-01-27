@@ -17,9 +17,17 @@ export default (appInfo: EggAppInfo) => {
     },
   };
 
+  config.schedule = {
+    update_shimo: {
+      interval: '1m',
+    },
+  };
+
   config.github = {
-    username: '',
-    password: '',
+    token: 'YOUR TOKEN',
+    owner: 'wuhan2020',
+    repo: 'wuhan2020-test',
+    message: 'data-sync',
   };
 
   // add your special config in here

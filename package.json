@@ -22,8 +22,10 @@
     "clean": "ets clean"
   },
   "dependencies": {
+    "@octokit/rest": "^16.38.3",
     "egg": "^2.6.1",
-    "egg-scripts": "^2.6.0"
+    "egg-scripts": "^2.6.0",
+    "shimo-sheet2json": "^1.0.4"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.40",
