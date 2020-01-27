@@ -7,6 +7,6 @@ describe('test/app/controller/home.test.ts', () => {
       .httpRequest()
       .get('/')
       .expect(200);
-    assert(result.text === 'hi, egg');
+    assert(result.text === 'hi, Wuhan2020');
   });
 });

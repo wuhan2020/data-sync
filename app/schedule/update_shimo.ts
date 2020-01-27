@@ -3,7 +3,7 @@ import { Subscription } from 'egg';
 export default class UpdateShimo extends Subscription {
   static get schedule() {
     return {
-      interval: '5m', // 1 分钟间隔
+      interval: '5m',
       type: 'all', // 指定所有的 worker 都需要执行
       immediate: true,
     };
