@@ -1,0 +1,51 @@
+@startuml Architecture diagram for wuhan2020 project
+!include https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+'LAYOUT_WITH_LEGEND()
+'LAYOUT_AS_SKETCH()
+
+title
+
+    <u>Architecture diagram for wuhan2020 project</u>
+
+end title
+
+Person(volunteer, "volunteer")
+
+
+    System(shimo, "Shimo", "Sheet collections")
+    System(github, "wuhan2020/wuhan2020", "Yaml")
+
+
+System_Boundary(data, "wuhan2020/data-sync"){
+    System(dataFetcher, "Data fetcher", "")
+    System_Boundary(dataParser, "Data parser"){
+        System_Ext(pluginYML, "YAML Plugin")
+        System_Ext(pluginXML, "XML Plugin")
+        System_Ext(pluginCVS, "CVS Plugin")
+        System_Ext(pluginJSON, "JSON Plugin")
+        System_Ext(pluginOther, "...")
+    }
+    System(dataExport, "Data export", "")
+}
+
+System_Boundary(web, "wuhan2020/web-server"){
+    System_Boundary(api, "Rest-API Server"){
+        System(apiMap, "Map API", "")
+        System(apiWeb, "Web API", "")
+    }
+    System(front, "Web front-end", "")
+}
+
+Rel(volunteer, shimo, "Fill")
+Rel(shimo, dataFetcher, "Fetch")
+Rel(dataFetcher, dataParser, "Parse")
+Rel(dataParser, dataExport, "Export")
+Rel(dataExport, github, "YAML update")
+Rel(apiWeb, github, "Get YAML")
+Rel(front, api, "Render")
+Rel(apiMap, dataExport, "Get JSON")
+
+center footer Architecture diagram for wuhan2020 project
+
+@enduml

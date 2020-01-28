@@ -35,4 +35,4 @@ $ npm start
 
 ## 功能架构图
 
-![arch](http://api.hypertrons.io/umlrenderer/github/wuhan2020/data-sync?path=static/architecture.uml)
+![arch](http://api.hypertrons.io/umlrenderer/github/wuhan2020/data-sync?path=static/architecture.puml)
