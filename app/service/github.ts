@@ -3,11 +3,13 @@ import * as Octokit from '@octokit/rest';
 import * as moment from 'moment';
 import { Table } from '../schema/table';
 import { ShimoSheetFetcher } from 'shimo-sheet2json';
+import { EOL } from 'os';
 
 export default class GithubService extends Service {
 
   public async update() {
-    const { config, logger } = this.ctx.app;
+    const { logger } = this;
+    const { config } = this.ctx.app;
     const shimoFetcher = new ShimoSheetFetcher(config.shimo);
     const tables: Table[] = config.github.tables;
 
@@ -45,6 +47,7 @@ export default class GithubService extends Service {
     };
     const time = moment().format();
     let sha = '';
+    const newContent = Buffer.from(str).toString('base64');
 
     try {
       const res = await octokit.repos.getContents({
@@ -52,6 +55,12 @@ export default class GithubService extends Service {
         path,
       });
       sha = (res.data as any).sha;
+      const content = (res.data as any).content;
+      if (content.split(EOL).join('') === newContent) {
+        // returned content have multi lines, need to join
+        // no need to update
+        return;
+      }
     } catch (err) {
       if (err.name !== 'HttpError') { throw err; }
     }
@@ -60,7 +69,7 @@ export default class GithubService extends Service {
       ...options,
       path,
       message: `[${github.message}] ${time}`,
-      content: Buffer.from(str).toString('base64'),
+      content: newContent,
       sha,
     });
   }
