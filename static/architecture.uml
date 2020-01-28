@@ -1,0 +1,38 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+'LAYOUT_WITH_LEGEND()
+LAYOUT_AS_SKETCH()
+
+Person(volunteer, "volunteer")
+
+System_Boundary(database,"Data set"){
+    System(shimo, "Shimo", "Sheet collections")
+    System(github, "wuhan2020/wuhan2020", "Yaml")
+}
+
+System_Boundary(data, "wuhan2020/data-sync"){
+    System(dataFetcher, "Data fetcher", "")
+    System_Boundary(dataParser, "Data parser"){
+        System_Ext(pluginYML, "YAML Plugin")
+        System_Ext(pluginXML, "XML Plugin")
+        System_Ext(pluginCVS, "CVS Plugin")
+        System_Ext(pluginOther, "...")
+    }
+}
+
+System_Boundary(web, "wuhan2020/web-server"){
+    System(webAPI, "Rest-API Server", "")
+    System(webFront, "Web front-end", "")
+}
+
+Rel(volunteer, shimo, "Fill")
+Rel(shimo, dataFetcher, "Fetch")
+Rel(dataFetcher, pluginYML,"Parse")
+Rel(dataFetcher, pluginXML,"Parse")
+Rel(dataFetcher, pluginCVS,"Parse")
+Rel(dataFetcher, pluginOther,"Parse")
+Rel(pluginYML, github, "YAML update")
+Rel(webAPI, github, "Get data")
+Rel(webFront, webAPI, "Render")
+@enduml
