@@ -26,7 +26,7 @@ export default class GithubService extends Service {
           data = data.filter((item: any) => item['审核状态'] !== null);
           if (data.length > 0) {
             // only update if have data
-            await this.updateRepo(`data/json/${table.name}/${sheet}.json`, JSON.stringify(data));
+            await this.updateRepo(`data/json/${table.prefix}/${table.name}/${sheet}.json`, JSON.stringify(data));
           }
         } catch (e) {
           logger.error(e);

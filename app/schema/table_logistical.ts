@@ -3,6 +3,7 @@ import { Table } from './table';
 const logisticalTable: Table = {
   name: '物流',
   guid: 'RTHXp3ghtKXY3GcC',
+  prefix: 'wuhan2020',
   sheets: [ '工作表1' ],
   skipHead: 2,
   columns: [{
