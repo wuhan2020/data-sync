@@ -5,6 +5,7 @@ const hospitalTable: Table = {
   guid: 'k399pHyt6HKvW6xR',
   sheets: [ '武汉市', '黄石市', '十堰市', '宜昌市', '襄阳市', '鄂州市', '荆门市', '孝感市', '荆州市', '黄冈市', '咸宁市',
     '随州市', '施恩土家族苗族自治州' ],
+  prefix: 'wuhan2020',
   skipHead: 5,
   columns: [{
     name: '区县',
