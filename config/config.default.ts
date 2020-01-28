@@ -2,6 +2,7 @@ import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
 import hospitalTable from '../app/schema/table_hospital';
 import logisticalTable from '../app/schema/table_logistical';
 import hotelTable from '../app/schema/table_hotel';
+import clinicTable from '../app/schema/table_clinic';
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -25,7 +26,7 @@ export default (appInfo: EggAppInfo) => {
     owner: 'wuhan2020',
     repo: 'wuhan2020-test',
     message: 'data-sync',
-    tables: [hospitalTable, logisticalTable, hotelTable],
+    tables: [hospitalTable, logisticalTable, hotelTable, clinicTable],
   };
 
   config.github = githubConfig;
