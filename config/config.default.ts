@@ -27,7 +27,13 @@ export default (appInfo: EggAppInfo) => {
     owner: 'wuhan2020',
     repo: 'wuhan2020-test',
     message: 'data-sync',
-    tables: [hospitalTable, logisticalTable, hotelTable, clinicTable, donationTable],
+    tables: [
+      hospitalTable,
+      logisticalTable,
+      hotelTable,
+      clinicTable,
+      donationTable,
+    ],
   };
 
   config.github = githubConfig;
