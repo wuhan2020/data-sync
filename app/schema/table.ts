@@ -3,7 +3,6 @@ export interface Table {
   sheets: string[];
   skipHead: number;
   name: string;
-  prefix: string;
   columns: {
     name: string;
     type?: 'addr' | 'contact' | 'url' | undefined;
