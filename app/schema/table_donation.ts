@@ -1,6 +1,6 @@
-import { Table } from './table';
+import { TableConfig } from './table';
 
-const donationTable: Table = {
+const donationTable: TableConfig = {
   name: '捐款',
   guid: 'W3gxW6cwkYTDY6DD',
   sheets: [ '工作表1' ],

@@ -1,6 +1,6 @@
-import { Table } from './table';
+import { TableConfig } from './table';
 
-const logisticalTable: Table = {
+const logisticalTable: TableConfig = {
   name: '物流',
   guid: 'RTHXp3ghtKXY3GcC',
   sheets: [ '工作表1' ],

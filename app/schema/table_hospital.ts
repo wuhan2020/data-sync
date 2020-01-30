@@ -1,6 +1,6 @@
-import { Table } from './table';
+import { TableConfig } from './table';
 
-const hospitalTable: Table = {
+const hospitalTable: TableConfig = {
   name: '医院',
   guid: 'k399pHyt6HKvW6xR',
   sheets: [ '武汉市', '黄石市', '十堰市', '宜昌市', '襄阳市', '鄂州市', '荆门市', '孝感市', '荆州市', '黄冈市', '咸宁市',

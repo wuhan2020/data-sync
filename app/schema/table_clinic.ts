@@ -1,6 +1,6 @@
-import { Table } from './table';
+import { TableConfig } from './table';
 
-const clinicTable: Table = {
+const clinicTable: TableConfig = {
   name: '义诊',
   guid: 'JgXjYCJJTRQxJ3GP',
   sheets: [ '工作表1' ],
