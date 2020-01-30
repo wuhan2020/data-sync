@@ -38,6 +38,22 @@ export default (appInfo: EggAppInfo) => {
 
   config.github = githubConfig;
 
+  config.gitee = {
+    baseUrl: 'https://gitee.com',
+    auth: {
+
+      username: 'YOUR USERNAME',
+      password: 'YOUR PASSWORD',
+      clientId: 'YOUR CLIENT ID',
+      clientSecret: 'YOUR CLIENT SECRET',
+      scope: 'YOUR SCOPE',
+    },
+    owner: 'Open-Xlab',
+    repo: 'wuhan2020',
+    message: 'data-sync',
+    tables: [ hospitalTable, logisticalTable, hotelTable, clinicTable, donationTable ],
+  };
+
   config.shimo = {
     username: 'YOUR USERNAME',
     password: 'YOUR PASSWORD',

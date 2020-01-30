@@ -1,6 +1,7 @@
 import { Service } from 'egg';
 import * as request from 'request';
 import { TableConfig, defaultColumnType } from '../schema/table';
+import { GiteeClient } from '../component/gitee-client';
 
 export default class ShimoService extends Service {
 
@@ -8,7 +9,15 @@ export default class ShimoService extends Service {
   private rowBatch = 20;
   private token: string;
 
+  private shimoDataTemp: Map<string, any>;
+
   public async update() {
+    this.shimoDataTemp = new Map<string, any>();
+    await this.updateGithub();
+    await this.updateGitee();
+  }
+
+  public async updateGithub() {
     const { logger } = this;
     const { config } = this.ctx.app;
     const tables: TableConfig[] = config.github.tables;
@@ -18,16 +27,49 @@ export default class ShimoService extends Service {
         try {
           logger.info(`Gonna get data from shimo, table=${table.name}, sheet=${sheet}`);
           let data = await this.getFileData(table, sheet);
-          data = this.ctx.service.dataFormat.format(data, table);
+          data = await this.ctx.service.dataFormat.format(data, table);
+          this.shimoDataTemp.set(`${table.name}/${sheet}`, data);
           if (data.length > 0) {
             // only update if have data
-            logger.info(data);
             await this.ctx.service.github.updateRepo(`data/json/${table.name}/${sheet}.json`, JSON.stringify(data));
           }
         } catch (e) {
           logger.error(e);
         }
       }
+    }
+  }
+
+  public async updateGitee() {
+    const { logger } = this;
+    const { config } = this.ctx.app;
+    const tables: TableConfig[] = config.gitee.tables;
+    const token = await GiteeClient.getToken(config.gitee.baseUrl, config.gitee.auth);
+    if (!token) {
+      logger.error('Get gitee token error!');
+      return;
+    }
+
+    for (const table of tables) {
+      for (const sheet of table.sheets) {
+        try {
+          logger.info(`Gonna get data from shimo for gitee, table=${table.name}, sheet=${sheet}`);
+          let data = this.shimoDataTemp.get(`${table.name}/${sheet}`);
+          if (data === undefined) {
+            data = await this.getFileData(table, sheet);
+            data = await this.ctx.service.dataFormat.format(data, table);
+            this.shimoDataTemp.set(`${table.name}/${sheet}`, data);
+          }
+          if (data.length > 0) {
+            // only update if have data
+            await this.ctx.service.gitee.updateRepo(`data/json/${table.name}/${sheet}.json`, JSON.stringify(data), token);
+          }
+        } catch (e) {
+          logger.error(e);
+        }
+        break;
+      }
+      break;
     }
   }
 
