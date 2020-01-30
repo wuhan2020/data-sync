@@ -5,11 +5,11 @@ export default class UpdateShimo extends Subscription {
     return {
       interval: '15m',
       type: 'worker', // only one worker needed
-      immediate: false, // not update on start
+      immediate: true, // update on start
     };
   }
   async subscribe() {
     const { ctx } = this;
-    await ctx.service.github.update();
+    await ctx.service.shimo.update();
   }
 }
