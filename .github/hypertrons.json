@@ -59,7 +59,7 @@
       {
         "name": "approver",
         "description": "After approvers' approve, pulls should be merged automatically",
-        "users": [ "frank-zsy", "WuShaoling", "bkbabydp" ],
+        "users": [ "frank-zsy", "WuShaoling", "bkbabydp", "JoeZijunZhou" ],
         "commands": [ "/approve" ]
       },
       {
