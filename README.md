@@ -1,5 +1,7 @@
 # data-sync
 
+![travis](https://travis-ci.com/wuhan2020/data-sync.svg?branch=master)
+
 武汉新型冠状病毒防疫信息收集平台-数据同步服务
 using typescript && egg
 
