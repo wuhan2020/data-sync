@@ -116,7 +116,7 @@ export default class ShimoService extends Service {
   }
 
   private async getFileContent(accessToken: string, tableConfig: TableConfig, sheetName: string): Promise<any> {
-    let row = tableConfig.skipHead + 1;
+    let row = tableConfig.skipRows + 1;
     let range = '';
     const maxCol = this.getMaxColumn(tableConfig.columns.length);
     let done = false;

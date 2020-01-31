@@ -4,7 +4,7 @@ const donationTable: TableConfig = {
   name: '捐款',
   guid: 'W3gxW6cwkYTDY6DD',
   sheets: [ '工作表1' ],
-  skipHead: 2,
+  skipRows: 2,
   columns: [{
     name: '受赠方',
   }, {

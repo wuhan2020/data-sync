@@ -4,7 +4,7 @@ const clinicTable: TableConfig = {
   name: '义诊',
   guid: 'JgXjYCJJTRQxJ3GP',
   sheets: [ '工作表1' ],
-  skipHead: 2,
+  skipRows: 2,
   columns: [{
     name: '义诊单位或个人',
   }, {

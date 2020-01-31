@@ -4,7 +4,7 @@ const logisticalTable: TableConfig = {
   name: '物流',
   guid: 'RTHXp3ghtKXY3GcC',
   sheets: [ '工作表1' ],
-  skipHead: 2,
+  skipRows: 2,
   columns: [{
     name: '物流名称',
   }, {

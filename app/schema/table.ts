@@ -1,13 +1,12 @@
 export interface TableConfig {
   guid: string;
-  sheets: string[];
-  skipHead: number;
   name: string;
-  columns: {
-    name: string;
-    type?: 'address' | 'contact' | 'url' | 'int' | 'float' | 'string' | 'date' | 'supply' | 'enum' | 'bool' | undefined;
-    parser?: <T>(content: string) => T;
-  }[];
+  sheets: string[];
+  skipRows: number;
+  skipColumns: number;
+  nameRow: number;
+  typeRow: number;
+  defaultValueRow: number;
   validation?: (row: any[]) => boolean;
 }
 
