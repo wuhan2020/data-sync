@@ -1,9 +1,9 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
 import hospitalTable from '../app/schema/table_hospital';
+import travelHotelTable from '../app/schema/table_travel_hotel';
 import logisticalTable from '../app/schema/table_logistical';
-import hotelTable from '../app/schema/table_hotel';
-import clinicTable from '../app/schema/table_clinic';
 import donationTable from '../app/schema/table_donation';
+import clinicTable from '../app/schema/table_clinic';
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -27,13 +27,6 @@ export default (appInfo: EggAppInfo) => {
     owner: 'wuhan2020',
     repo: 'wuhan2020-test',
     message: 'data-sync',
-    tables: [
-      hospitalTable,
-      logisticalTable,
-      hotelTable,
-      clinicTable,
-      donationTable,
-    ],
   };
 
   config.github = githubConfig;
@@ -51,7 +44,6 @@ export default (appInfo: EggAppInfo) => {
     owner: 'Open-Xlab',
     repo: 'wuhan2020',
     message: 'data-sync',
-    tables: [ hospitalTable, logisticalTable, hotelTable, clinicTable, donationTable ],
   };
 
   config.shimo = {
@@ -59,6 +51,13 @@ export default (appInfo: EggAppInfo) => {
     password: 'YOUR PASSWORD',
     clientId: 'YOUR CLIENT ID',
     clientSecret: 'YOUR CLIENT SECRET',
+    tables: [
+      hospitalTable,
+      travelHotelTable,
+      logisticalTable,
+      donationTable,
+      clinicTable,
+    ],
   };
 
   // the return config will combines to EggAppConfig
