@@ -22,6 +22,9 @@ export default class DataFormatService extends Service {
       } else if (item.type.startsWith('supply')) {
         // supply|specification
         type = 'supply';
+      } else if (item.type.startsWith('bool')) {
+        // bool{是,否}
+        type = 'bool';
       }
       const formatter = DataFormatService.fomatters.get(type);
       if (!formatter) {
@@ -155,6 +158,11 @@ export default class DataFormatService extends Service {
     return item;
   }
 
+  public static boolFormatter: FormatFunc = item => {
+    // TODO
+    return item;
+  }
+
   public static fomatters: Map<string, FormatFunc> = new Map([
     [
       'address', // 地址类信息，自动添加经纬度
@@ -180,6 +188,9 @@ export default class DataFormatService extends Service {
     ], [
       'enum', // 枚举类型
       DataFormatService.enumFormatter,
+    ], [
+      'bool', // 类型
+      DataFormatService.boolFormatter,
     ],
   ]);
 

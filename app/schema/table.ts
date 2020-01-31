@@ -5,7 +5,7 @@ export interface TableConfig {
   name: string;
   columns: {
     name: string;
-    type?: 'address' | 'contact' | 'url' | 'int' | 'float' | 'string' | 'date' | 'supply' | 'enum' | undefined;
+    type?: 'address' | 'contact' | 'url' | 'int' | 'float' | 'string' | 'date' | 'supply' | 'enum' | 'bool' | undefined;
     parser?: <T>(content: string) => T;
   }[];
   validation?: (row: any[]) => boolean;
