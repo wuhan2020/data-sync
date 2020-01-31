@@ -13,22 +13,27 @@ const hospitalTable: TableConfig = {
   getFilePath: (sheet: string) => `hospital/hubei/${pinyin(sheet, { style: pinyin.STYLE_NORMAL }).join('')}.json`,
   feParser: (data: any[], sheet: string) => {
     return data.map(row => {
-      return {
-        province: '湖北',
-        city: sheet,
-        district: getCellByName(row, '区县').value,
-        name: getCellByName(row, '医院名称').value,
-        supplies: getAllCellsByType(row, 'supply').filter((cell: any) => cell.value !== 0).map((cell: any) => {
-          return {
-            key: cell.key,
-            value: cell.value,
-            specification: cell.specification,
-          };
-        }),
-        url: getCellByType(row, 'url').value,
-        remark: getCellByName(row, '备注').value,
-      };
-    });
+      try {
+        return {
+          province: '湖北',
+          city: sheet,
+          district: getCellByName(row, '区县').value,
+          name: getCellByName(row, '医院名称').value,
+          supplies: getAllCellsByType(row, 'supply').filter((cell: any) => cell.value !== 0).map((cell: any) => {
+            return {
+              key: cell.key,
+              value: cell.value,
+              specification: cell.specification,
+            };
+          }),
+          url: getCellByType(row, 'url').value,
+          remark: getCellByName(row, '备注').value,
+          contacts: getCellByType(row, 'contact').value,
+        };
+      } catch {
+        return null;
+      }
+    }).filter(item => item !== null);
   },
 };
 
