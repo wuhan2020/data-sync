@@ -9,9 +9,22 @@ export interface TableConfig {
   maxColumn: string;
   validation?: (row: any[]) => boolean;
   getFilePath: (sheet: string) => string;
+  feParser?: (data: any[], sheet: string) => any;
 }
 
 export const defaultColumnType = 'string';
 export const defaultValidation = (row: any[]): boolean => {
   return row.some(item => item.key === '审核状态' && item.value !== null);
 };
+
+export function getCellByType(row: any[], type: string): any {
+  return row.find(cell => cell.type === type);
+}
+
+export function getCellByName(row: any[], key: string): any {
+  return row.find(cell => cell.key === key);
+}
+
+export function getAllCellsByType(row: any[], type: string): any {
+  return row.filter(cell => cell.type === type);
+}

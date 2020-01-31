@@ -1,15 +1,35 @@
-import { TableConfig } from './table';
+import { TableConfig, getCellByName, getAllCellsByType, getCellByType } from './table';
+import pinyin = require('pinyin');
 
 const hospitalTable: TableConfig = {
-  guid: 'q6WP3DpKKgVW63Pr',
+  guid: 'k399pHyt6HKvW6xR',
   sheets: [ '武汉市', '黄石市', '十堰市', '宜昌市', '襄阳市', '鄂州市', '荆门市', '孝感市', '荆州市', '黄冈市', '咸宁市', '随州市', '施恩土家族苗族自治州', '仙桃市', '潜江市', '天门市' ],
   skipRows: 6,
   skipColumns: 1,
-  nameRow: 4,
-  typeRow: 5,
-  defaultValueRow: 6,
-  maxColumn: 'BR',
-  getFilePath: (sheet: string) => `医院/湖北/${sheet}.json`,
+  nameRow: 3,
+  typeRow: 4,
+  defaultValueRow: 5,
+  maxColumn: 'AE',
+  getFilePath: (sheet: string) => `hospital/hubei/${pinyin(sheet, { style: pinyin.STYLE_NORMAL }).join('')}.json`,
+  feParser: (data: any[], sheet: string) => {
+    return data.map(row => {
+      return {
+        province: '湖北',
+        city: sheet,
+        district: getCellByName(row, '区县').value,
+        name: getCellByName(row, '医院名称').value,
+        supplies: getAllCellsByType(row, 'supply').filter((cell: any) => cell.value !== 0).map((cell: any) => {
+          return {
+            key: cell.key,
+            value: cell.value,
+            specification: cell.specification,
+          };
+        }),
+        url: getCellByType(row, 'url').value,
+        remark: getCellByName(row, '备注').value,
+      };
+    });
+  },
 };
 
 export default hospitalTable;

@@ -55,7 +55,12 @@ export default class DataFormatService extends Service {
   }
 
   public static contactFormatter: FormatFunc = item => {
-    const v: string = item.value.toString();
+    let v: any = item.value;
+    if (v === null) {
+      item.value = [];
+      return item;
+    }
+    v = v.toString();
     const contacts: {name: string; tel: string}[] = [];
     v.replace('：', ':').split('|').forEach(contact => {
       const s = contact.trim().split(':');
@@ -142,7 +147,7 @@ export default class DataFormatService extends Service {
     if (item.value === null) {
       return item;
     }
-    const vs = item.value.split('|');
+    const vs = item.value.toString().split('|');
     try {
       item.value = parseInt(vs[0].trim());
     } catch {

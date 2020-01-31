@@ -33,6 +33,9 @@ export default class ShimoService extends Service {
           if (data.length > 0) {
             // only update if have data
             await this.ctx.service.github.updateRepo(`data/json/${filePath}`, JSON.stringify(data));
+            if (table.feParser) {
+              await this.ctx.service.github.updateRepo(`data/fe/${filePath}`, JSON.stringify(table.feParser(data, sheet)));
+            }
           }
         } catch (e) {
           logger.error(e);
@@ -131,7 +134,7 @@ export default class ShimoService extends Service {
     const res: any[] = [];
     while (!done) {
       range = `${sheetName}!${minCol}${row}:${maxCol}${row + this.rowBatch}`;
-      row += this.rowBatch;
+      row += this.rowBatch + 1;
       const values = await this.getFileContentRange(accessToken, tableConfig.guid, range);
       for (const row of values) {
         if (!row.some(v => v !== null)) {

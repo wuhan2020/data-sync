@@ -28,6 +28,7 @@
     "egg-scripts": "^2.6.0",
     "http2": "^3.3.7",
     "moment": "^2.24.0",
+    "pinyin": "^2.9.0",
     "querystring": "^0.2.0",
     "request": "^2.88.0"
   },
