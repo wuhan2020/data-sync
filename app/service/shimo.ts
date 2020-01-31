@@ -20,18 +20,19 @@ export default class ShimoService extends Service {
   public async updateGithub() {
     const { logger } = this;
     const { config } = this.ctx.app;
-    const tables: TableConfig[] = config.github.tables;
+    const tables: TableConfig[] = config.shimo.tables;
 
     for (const table of tables) {
       for (const sheet of table.sheets) {
         try {
-          logger.info(`Gonna get data from shimo, table=${table.name}, sheet=${sheet}`);
+          const filePath = table.getFilePath(sheet);
+          logger.info(`Gonna get file from shimo, file=${filePath}, sheet=${sheet}`);
           let data = await this.getFileData(table, sheet);
           data = await this.ctx.service.dataFormat.format(data, table);
-          this.shimoDataTemp.set(`${table.name}/${sheet}`, data);
+          this.shimoDataTemp.set(filePath, data);
           if (data.length > 0) {
             // only update if have data
-            await this.ctx.service.github.updateRepo(`data/json/${table.name}/${sheet}.json`, JSON.stringify(data));
+            await this.ctx.service.github.updateRepo(`data/json/${filePath}`, JSON.stringify(data));
           }
         } catch (e) {
           logger.error(e);
@@ -43,7 +44,7 @@ export default class ShimoService extends Service {
   public async updateGitee() {
     const { logger } = this;
     const { config } = this.ctx.app;
-    const tables: TableConfig[] = config.gitee.tables;
+    const tables: TableConfig[] = config.shimo.tables;
     const token = await GiteeClient.getToken(config.gitee.baseUrl, config.gitee.auth);
     if (!token) {
       logger.error('Get gitee token error!');
@@ -53,23 +54,22 @@ export default class ShimoService extends Service {
     for (const table of tables) {
       for (const sheet of table.sheets) {
         try {
-          logger.info(`Gonna get data from shimo for gitee, table=${table.name}, sheet=${sheet}`);
-          let data = this.shimoDataTemp.get(`${table.name}/${sheet}`);
+          const filePath = table.getFilePath(sheet);
+          logger.info(`Gonna get data from shimo for gitee, file=${filePath}, sheet=${sheet}`);
+          let data = this.shimoDataTemp.get(`${filePath}/${sheet}`);
           if (data === undefined) {
             data = await this.getFileData(table, sheet);
             data = await this.ctx.service.dataFormat.format(data, table);
-            this.shimoDataTemp.set(`${table.name}/${sheet}`, data);
+            this.shimoDataTemp.set(`${filePath}/${sheet}`, data);
           }
           if (data.length > 0) {
             // only update if have data
-            await this.ctx.service.gitee.updateRepo(`data/json/${table.name}/${sheet}.json`, JSON.stringify(data), token);
+            await this.ctx.service.gitee.updateRepo(`data/json/${filePath}`, JSON.stringify(data), token);
           }
         } catch (e) {
           logger.error(e);
         }
-        break;
       }
-      break;
     }
   }
 
@@ -116,13 +116,21 @@ export default class ShimoService extends Service {
   }
 
   private async getFileContent(accessToken: string, tableConfig: TableConfig, sheetName: string): Promise<any> {
-    let row = tableConfig.skipRows + 1;
     let range = '';
-    const maxCol = this.getMaxColumn(tableConfig.columns.length);
+    let row = tableConfig.skipRows + 1;
+    const minCol = this.getColumnName(tableConfig.skipColumns + 1);
+    const maxCol = tableConfig.maxColumn;
     let done = false;
+
+    const names = (await this.getFileContentRange(accessToken, tableConfig.guid,
+      `${sheetName}!${minCol}${tableConfig.nameRow}:${maxCol}${tableConfig.nameRow}`))[0];
+    const types = (await this.getFileContentRange(accessToken, tableConfig.guid,
+      `${sheetName}!${minCol}${tableConfig.typeRow}:${maxCol}${tableConfig.typeRow}`))[0];
+    const defaultValues = (await this.getFileContentRange(accessToken, tableConfig.guid,
+      `${sheetName}!${minCol}${tableConfig.defaultValueRow}:${maxCol}${tableConfig.defaultValueRow}`))[0];
     const res: any[] = [];
     while (!done) {
-      range = `${sheetName}!A${row}:${maxCol}${row + this.rowBatch}`;
+      range = `${sheetName}!${minCol}${row}:${maxCol}${row + this.rowBatch}`;
       row += this.rowBatch;
       const values = await this.getFileContentRange(accessToken, tableConfig.guid, range);
       for (const row of values) {
@@ -134,9 +142,9 @@ export default class ShimoService extends Service {
         const rowData: any[] = [];
         row.forEach((v, i) => {
           rowData.push({
-            key: tableConfig.columns[i].name,
-            value: v,
-            type: tableConfig.columns[i].type ?? defaultColumnType,
+            key: names[i],
+            value: v !== null ? v : defaultValues[i],
+            type: types[i] ?? defaultColumnType,
           });
         });
         res.push(rowData);
@@ -145,13 +153,13 @@ export default class ShimoService extends Service {
     return res;
   }
 
-  private getMaxColumn(num: number): string {
+  private getColumnName(num: number): string {
     const numToChar = (n: number): string => {
       n = Math.floor(n % 26);
       if (n === 0) {
         return '';
       }
-      return String.fromCharCode(65 + n - 1);
+      return String.fromCharCode(n + 64);
     };
     return numToChar(num / 26) + numToChar(num); // 1 -> A, 2 -> B support 26*26
   }

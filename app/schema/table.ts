@@ -1,13 +1,14 @@
 export interface TableConfig {
   guid: string;
-  name: string;
   sheets: string[];
   skipRows: number;
   skipColumns: number;
   nameRow: number;
   typeRow: number;
   defaultValueRow: number;
+  maxColumn: string;
   validation?: (row: any[]) => boolean;
+  getFilePath: (sheet: string) => string;
 }
 
 export const defaultColumnType = 'string';

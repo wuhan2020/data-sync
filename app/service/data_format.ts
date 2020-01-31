@@ -1,9 +1,7 @@
 import { Service } from 'egg';
 import { TableConfig, defaultValidation } from '../schema/table';
 
-interface FormatFunc {
-  (item: any): any;
-}
+type FormatFunc = (item: any) => any;
 
 export default class DataFormatService extends Service {
 
@@ -11,43 +9,53 @@ export default class DataFormatService extends Service {
     data = data.filter(item => {
       return tableConfig.validation ? tableConfig.validation(item) : defaultValidation(item);
     });
-    data = data.map(item => {
-      if (!item.type) {
-        return item;
-      }
-      let type = item.type;
-      if (item.type.startsWith('enum')) {
-        // enum{a,b}
-        type = 'enum';
-      } else if (item.type.startsWith('supply')) {
-        // supply|specification
-        type = 'supply';
-      } else if (item.type.startsWith('bool')) {
-        // bool{是,否}
-        type = 'bool';
-      }
-      const formatter = DataFormatService.fomatters.get(type);
-      if (!formatter) {
-        return item;
-      }
-      try {
-        const i = formatter(item);
-        return i ? i : item;
-      } catch {
+    data = data.map(row => {
+      const newRow: any[] = [];
+      row.forEach((cell: any) => {
+        const parse = () => {
+          if (!cell.type) {
+            return cell;
+          }
+          let type = cell.type;
+          if (cell.type.startsWith('enum')) {
+            // enum{a,b}
+            type = 'enum';
+          } else if (cell.type.startsWith('supply')) {
+            // supply|specification
+            type = 'supply';
+          } else if (cell.type.startsWith('bool')) {
+            // bool{是,否}
+            type = 'bool';
+          }
+          const formatter = DataFormatService.fomatters.get(type);
+          if (!formatter) {
+            return cell;
+          }
+          try {
+            const i = formatter(cell);
+            return i ? i : cell;
+          } catch (e) {
+            return null;
+          }
+        };
+        newRow.push(parse());
+      });
+      if (newRow.includes(null)) {
         return null;
       }
+      return newRow;
     });
-    data = data.filter(data => data !== null);
+    data = data.filter(row => row !== null);
     return data;
   }
 
   public static addressFormatter: FormatFunc = item => {
-    item.coord = [0, 0];
+    item.coord = [ 0, 0 ];
     return item;
   }
 
   public static contactFormatter: FormatFunc = item => {
-    const v: string = item.value;
+    const v: string = item.value.toString();
     const contacts: {name: string; tel: string}[] = [];
     v.replace('：', ':').split('|').forEach(contact => {
       const s = contact.trim().split(':');
@@ -105,7 +113,11 @@ export default class DataFormatService extends Service {
 
   public static dateFormatter: FormatFunc = item => {
     if (item.value !== null) {
-      item.value = new Date(item.value);
+      if (typeof item.value === 'number') {
+        item.value = DataFormatService.fromOADate(item.value);
+      } else {
+        item.value = new Date(item.value);
+      }
     }
     return item;
   }
@@ -124,7 +136,7 @@ export default class DataFormatService extends Service {
       throw new Error(`Supply type error, type=${item.type}`);
     }
     item.type = 'supply';
-    if (ts.lenght > 1) {
+    if (ts.length > 1) {
       item.specification = ts[1];
     }
     if (item.value === null) {
@@ -142,7 +154,7 @@ export default class DataFormatService extends Service {
     return item;
   }
 
-  private static enumRegex = /^eunm{(.*)}/;
+  private static enumRegex = /^enum{(.*)}/;
   public static enumFormatter: FormatFunc = item => {
     if (item.value === null) {
       return item;
@@ -167,31 +179,77 @@ export default class DataFormatService extends Service {
     [
       'address', // 地址类信息，自动添加经纬度
       DataFormatService.addressFormatter,
-    ], [
+    ],
+    [
       'contact', // 联系人
       DataFormatService.contactFormatter,
-    ], [
+    ],
+    [
       'int', // 整型
       DataFormatService.intFormatter,
-    ], [
+    ],
+    [
       'float', // 浮点型
       DataFormatService.floatFormatter,
-    ], [
+    ],
+    [
       'date', // 时间型
       DataFormatService.dateFormatter,
-    ], [
+    ],
+    [
       'url', // 链接类型
       DataFormatService.urlFormatter,
-    ], [
+    ],
+    [
       'supply', // 物资类型
       DataFormatService.supplyFormatter,
-    ], [
+    ],
+    [
       'enum', // 枚举类型
       DataFormatService.enumFormatter,
-    ], [
+    ],
+    [
       'bool', // 类型
       DataFormatService.boolFormatter,
     ],
   ]);
 
+  private static fromOADate(oadate: any) {
+    function _getTimezoneOffset(date: any) {
+      let offset = date.getTimezoneOffset();
+      if (offset === -485) {
+        offset = -485 - 43 / 60;
+      }
+      return offset;
+    }
+
+    const offsetDay = oadate - 25569;
+    const date = new Date(offsetDay * 86400000);
+
+    const adjustValue = offsetDay >= 0 ? 1 : -1;
+    const oldDateTimezoneOffset = _getTimezoneOffset(date);
+    const ms = (oadate * 86400000 * 1440 + adjustValue - 25569 * 86400000 * 1440 + oldDateTimezoneOffset * 86400000) / 1440;
+    let firstResult = new Date(ms);
+
+    const fixHourSign = oldDateTimezoneOffset >= 0 ? 1 : -1;
+    const nextHour = new Date(ms + fixHourSign * 3600000);
+    const nextHourTimezoneOffset = _getTimezoneOffset(nextHour);
+    if (oldDateTimezoneOffset !== nextHourTimezoneOffset) {
+      let newResult = new Date(ms + (nextHourTimezoneOffset - oldDateTimezoneOffset) * 60 * 1000);
+      if (oldDateTimezoneOffset > nextHourTimezoneOffset) {
+        if (fixHourSign === -1 || nextHourTimezoneOffset === _getTimezoneOffset(firstResult)) {
+          newResult = newResult.getMilliseconds() === 999 ? new Date(newResult.valueOf() + 1) : newResult;
+          return newResult;
+        }
+      } else if (oldDateTimezoneOffset < nextHourTimezoneOffset) {
+        if (fixHourSign === 1 || nextHourTimezoneOffset === _getTimezoneOffset(firstResult)) {
+          newResult = newResult.getMilliseconds() === 999 ? new Date(newResult.valueOf() + 1) : newResult;
+          return newResult;
+        }
+      }
+    }
+
+    firstResult = firstResult.getMilliseconds() === 999 ? new Date(firstResult.valueOf() + 1) : firstResult;
+    return firstResult;
+  }
 }
