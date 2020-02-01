@@ -65,7 +65,6 @@ export default class DataFormatService extends Service {
     v.split('：').join(':').split('|').
       forEach(contact => {
         const s = contact.trim().split(':');
-        console.log(s);
         if (s[0].trim() === '') return;
         if (s.length > 2) {
           throw new Error(`Contact value error, value=${item.value}`);

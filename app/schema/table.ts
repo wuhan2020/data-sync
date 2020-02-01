@@ -13,7 +13,7 @@ export interface TableConfig {
   feParser?: (data: any[], sheet: string) => any;
 }
 
-export function getCellByType(row: any[], type: string): any {
+export function getCellByType(row: any[], type: ColumnTypes): any {
   return row.find(cell => cell.type === type);
 }
 
@@ -30,3 +30,5 @@ export const defaultValidation = (row: any[]): boolean => {
   const v = getCellByName(row, '审核状态').value;
   return v !== null && !v.includes('未');
 };
+
+export type ColumnTypes = 'string' | 'int' | 'float' | 'url' | 'address' | 'enum' | 'supply' | 'contact' | 'date';

@@ -28,6 +28,7 @@ const hospitalTable: TableConfig = {
               specification: cell.specification,
             };
           }),
+          address: getCellByType(row, 'address').value,
           url: getCellByType(row, 'url').value,
           remark: getCellByName(row, '备注').value,
           contacts: getCellByType(row, 'contact').value,
