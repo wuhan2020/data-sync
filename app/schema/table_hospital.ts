@@ -3,6 +3,7 @@ import pinyin = require('pinyin');
 
 const hospitalTable: TableConfig = {
   guid: 'k399pHyt6HKvW6xR',
+  indexKey: 'hospital',
   sheets: [ '武汉市', '黄石市', '十堰市', '宜昌市', '襄阳市', '鄂州市', '荆门市', '孝感市', '荆州市', '黄冈市', '咸宁市', '随州市', '施恩土家族苗族自治州', '仙桃市', '潜江市', '天门市' ],
   skipRows: 6,
   skipColumns: 1,
@@ -12,9 +13,10 @@ const hospitalTable: TableConfig = {
   maxColumn: 'AE',
   getFilePath: (sheet: string) => `hospital/hubei/${pinyin(sheet, { style: pinyin.STYLE_NORMAL }).join('')}.json`,
   feParser: (data: any[], sheet: string) => {
-    return data.map(row => {
+    return data.map((row, id) => {
       try {
         return {
+          id,
           province: '湖北',
           city: sheet,
           district: getCellByName(row, '区县').value,

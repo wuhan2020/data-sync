@@ -7,6 +7,7 @@ export interface TableConfig {
   typeRow: number;
   defaultValueRow: number;
   maxColumn: string;
+  indexKey: string;
   validation?: (row: any[]) => boolean;
   getFilePath: (sheet: string) => string;
   feParser?: (data: any[], sheet: string) => any;

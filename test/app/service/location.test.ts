@@ -4,7 +4,6 @@ import { app } from 'egg-mock/bootstrap';
 describe('test/app/service/location.test.js', () => {
   let ctx: Context;
 
-
   before(async () => {
     ctx = app.mockContext();
   });

@@ -73,7 +73,8 @@ describe('test/app/service/data_format.test.js', () => {
         {
           name: '张三',
           tel: '139',
-        }, {
+        },
+        {
           name: '李四',
           tel: '021-32',
         },
@@ -90,7 +91,8 @@ describe('test/app/service/data_format.test.js', () => {
         {
           name: '张三',
           tel: '139',
-        }, {
+        },
+        {
           name: '',
           tel: '021-32',
         },

@@ -2,6 +2,7 @@ import { TableConfig, getCellByName, getCellByType } from './table';
 
 const donationTable: TableConfig = {
   guid: 'W3gxW6cwkYTDY6DD',
+  indexKey: 'donation',
   sheets: [ '工作表1' ],
   skipRows: 4,
   skipColumns: 1,
@@ -11,8 +12,9 @@ const donationTable: TableConfig = {
   maxColumn: 'H',
   getFilePath: () => 'donation/data.json',
   feParser: (data: any[]) => {
-    return data.map(row => {
+    return data.map((row, id) => {
       return {
+        id,
         name: getCellByName(row, '受赠方').value,
         method: getCellByName(row, '收款方式').value,
         info: getCellByName(row, '收款账户').value,

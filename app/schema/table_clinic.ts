@@ -2,6 +2,7 @@ import { TableConfig, getCellByName, getCellByType } from './table';
 
 const clinicTable: TableConfig = {
   guid: 'JgXjYCJJTRQxJ3GP',
+  indexKey: 'clinic',
   sheets: [ '工作表1' ],
   skipRows: 4,
   skipColumns: 1,
@@ -11,8 +12,9 @@ const clinicTable: TableConfig = {
   maxColumn: 'G',
   getFilePath: () => 'clinic/data.json',
   feParser: (data: any[]) => {
-    return data.map(row => {
+    return data.map((row, id) => {
       return {
+        id,
         name: getCellByName(row, '义诊单位或个人').value,
         contacts: getCellByType(row, 'contact').value,
         date: getCellByType(row, 'date').value,

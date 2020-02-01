@@ -2,6 +2,7 @@ import { TableConfig, getCellByName, getCellByType } from './table';
 
 const logisticalTable: TableConfig = {
   guid: 'RTHXp3ghtKXY3GcC',
+  indexKey: 'logistical',
   sheets: [ '工作表1' ],
   skipRows: 4,
   skipColumns: 1,
@@ -11,8 +12,9 @@ const logisticalTable: TableConfig = {
   maxColumn: 'H',
   getFilePath: () => 'logistical/data.json',
   feParser: (data: any[]) => {
-    return data.map(row => {
+    return data.map((row, id) => {
       return {
+        id,
         name: getCellByName(row, '物流名称').value,
         area: getCellByName(row, '物流区域').value,
         contacts: getCellByType(row, 'contact').value,

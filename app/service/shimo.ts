@@ -22,7 +22,11 @@ export default class ShimoService extends Service {
     const { config } = this.ctx.app;
     const tables: TableConfig[] = config.shimo.tables;
 
+    const indexFiles = {};
     for (const table of tables) {
+      if (!indexFiles[table.indexKey]) {
+        indexFiles[table.indexKey] = [];
+      }
       for (const sheet of table.sheets) {
         try {
           const filePath = table.getFilePath(sheet);
@@ -37,11 +41,13 @@ export default class ShimoService extends Service {
               await this.ctx.service.github.updateRepo(`data/fe/${filePath}`, JSON.stringify(table.feParser(data, sheet)));
             }
           }
+          indexFiles[table.indexKey].push(filePath);
         } catch (e) {
           logger.error(e);
         }
       }
     }
+    await this.ctx.service.github.updateRepo('data/index.json', JSON.stringify(indexFiles));
   }
 
   public async updateGitee() {
