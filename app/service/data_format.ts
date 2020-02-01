@@ -62,24 +62,26 @@ export default class DataFormatService extends Service {
     }
     v = v.toString();
     const contacts: {name: string; tel: string}[] = [];
-    v.replace('：', ':').split('|').forEach(contact => {
-      const s = contact.trim().split(':');
-      if (s[0].trim() === '') return;
-      if (s.length > 2) {
-        throw new Error(`Contact value error, value=${item.value}`);
-      }
-      if (s.length === 2) {
-        contacts.push({
-          name: s[0].trim(),
-          tel: s[1].trim(),
-        });
-      } else {
-        contacts.push({
-          name: '',
-          tel: contact.trim(),
-        });
-      }
-    });
+    v.split('：').join(':').split('|').
+      forEach(contact => {
+        const s = contact.trim().split(':');
+        console.log(s);
+        if (s[0].trim() === '') return;
+        if (s.length > 2) {
+          throw new Error(`Contact value error, value=${item.value}`);
+        }
+        if (s.length === 2) {
+          contacts.push({
+            name: s[0].trim(),
+            tel: s[1].trim(),
+          });
+        } else {
+          contacts.push({
+            name: '',
+            tel: contact.trim(),
+          });
+        }
+      });
     item.value = contacts;
     return item;
   }
@@ -168,7 +170,8 @@ export default class DataFormatService extends Service {
     if (!res) {
       throw new Error(`Enum content error, type=${item.type}`);
     }
-    if (!res[1].replace('，', ',').split(',').some(v => v.trim() === item.value)) {
+    if (!res[1].split('，').join(',').split(',').
+      some(v => v.trim() === item.value)) {
       throw new Error(`Enum value error, value=${item.value}, type=${item.type}`);
     }
     item.type = 'enum';

@@ -103,6 +103,14 @@ describe('test/app/service/data_format.test.js', () => {
       assert.deepEqual(v.value, check);
     });
 
+    it('a real case', () => {
+      const valueStr = '王平： 13997712859 | 申西华：13872631977 | 廖勇：13986828368 | 代金枝： 13972001441';
+      const v = DataFormatService.contactFormatter({
+        value: valueStr,
+      });
+      console.log(v);
+    });
+
   });
 
   describe('supply', () => {
