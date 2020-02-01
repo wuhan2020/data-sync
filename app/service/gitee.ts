@@ -4,11 +4,25 @@ import * as moment from 'moment';
 
 export default class GiteeService extends Service {
 
-  public async updateRepo(path: string, str: string, token: string) {
+  private token: string;
+
+  public async updateRepo(path: string, str: string) {
     const { ctx, logger } = this;
     const config = ctx.app.config.gitee;
 
-    const gitee = new GiteeClient(config.baseUrl, config.owner, config.repo, token);
+    if (!config.enable) {
+      return;
+    }
+
+    if (!this.token) {
+      this.token = await GiteeClient.getToken(config.baseUrl, config.auth);
+    }
+    if (!this.token) {
+      logger.error('Get gitee token error!');
+      return;
+    }
+
+    const gitee = new GiteeClient(config.baseUrl, config.owner, config.repo, this.token);
     const newContent = Buffer.from(str).toString('base64');
     const message = `[${config.message}] ${moment().format()}`;
 

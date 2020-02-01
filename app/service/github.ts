@@ -7,13 +7,16 @@ export default class GithubService extends Service {
 
   public async updateRepo(path: string, str: string) {
     const { ctx, logger } = this;
-    const github = ctx.app.config.github;
+    const config = ctx.app.config.github;
+
+    if (!config.enable) return;
+
     const octokit = new Octokit({
-      auth: github.token,
+      auth: config.token,
     });
     const options = {
-      owner: github.owner,
-      repo: github.repo,
+      owner: config.owner,
+      repo: config.repo,
     };
     const time = moment().format();
     let sha = '';
@@ -38,7 +41,7 @@ export default class GithubService extends Service {
     await octokit.repos.createOrUpdateFile({
       ...options,
       path,
-      message: `[${github.message}] ${time}`,
+      message: `[${config.message}] ${time}`,
       content: newContent,
       sha,
     });

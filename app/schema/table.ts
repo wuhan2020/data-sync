@@ -1,4 +1,4 @@
-export interface TableConfig {
+export interface PreTableConfig {
   guid: string;
   sheets: string[];
   skipRows: number;
@@ -7,6 +7,11 @@ export interface TableConfig {
   typeRow: number;
   defaultValueRow: number;
   maxColumn: string;
+  preTable?: PreTableConfig;
+  preTableDetect?: (row: RowData) => any;
+}
+
+export interface TableConfig extends PreTableConfig {
   indexKey: string;
   validation?: (row: any[]) => boolean;
   getFilePath: (sheet: string) => string;
@@ -32,3 +37,17 @@ export const defaultValidation = (row: any[]): boolean => {
 };
 
 export type ColumnTypes = 'string' | 'int' | 'float' | 'url' | 'address' | 'enum' | 'supply' | 'contact' | 'date';
+
+export interface TableData {
+  guid: string;
+  data: SheetData[];
+}
+
+export interface SheetData {
+  sheetName: string;
+  data: RowData[];
+}
+
+export type RowData = CellData[];
+
+export type CellData = any;

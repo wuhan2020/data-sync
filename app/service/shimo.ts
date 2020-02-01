@@ -1,7 +1,6 @@
 import { Service } from 'egg';
 import * as request from 'request';
-import { TableConfig, defaultColumnType } from '../schema/table';
-import { GiteeClient } from '../component/gitee-client';
+import { TableConfig, defaultColumnType, PreTableConfig, RowData, SheetData, TableData } from '../schema/table';
 
 export default class ShimoService extends Service {
 
@@ -9,85 +8,38 @@ export default class ShimoService extends Service {
   private rowBatch = 20;
   private token: string;
 
-  private shimoDataTemp: Map<string, any>;
-
   public async update() {
-    this.shimoDataTemp = new Map<string, any>();
-    await this.updateGithub();
-    await this.updateGitee();
-  }
-
-  public async updateGithub() {
     const { logger } = this;
     const { config } = this.ctx.app;
     const tables: TableConfig[] = config.shimo.tables;
-
+    const updateFunc = async (path: string, data: any) => {
+      await this.ctx.service.github.updateRepo(path, data);
+      await this.ctx.service.gitee.updateRepo(path, data);
+    };
     const indexFiles = {};
     for (const table of tables) {
       if (!indexFiles[table.indexKey]) {
         indexFiles[table.indexKey] = [];
       }
-      for (const sheet of table.sheets) {
-        try {
-          const filePath = table.getFilePath(sheet);
-          logger.info(`Gonna get file from shimo, file=${filePath}, sheet=${sheet}`);
-          let data = await this.getFileData(table, sheet);
-          data = await this.ctx.service.dataFormat.format(data, table);
-          this.shimoDataTemp.set(filePath, data);
+      const tableData = await this.getTableData(table);
+      try {
+        for (const sheetData of tableData.data) {
+          const data = await this.ctx.service.dataFormat.format(sheetData.data, table);
+          const filePath = table.getFilePath(sheetData.sheetName);
           if (data.length > 0) {
             // only update if have data
-            await this.ctx.service.github.updateRepo(`data/json/${filePath}`, JSON.stringify(data));
+            await updateFunc(`data/json/${filePath}`, JSON.stringify(data));
             if (table.feParser) {
-              await this.ctx.service.github.updateRepo(`data/fe/${filePath}`, JSON.stringify(table.feParser(data, sheet)));
+              await updateFunc(`data/fe/${filePath}`, JSON.stringify(table.feParser(data, sheetData.sheetName)));
             }
           }
           indexFiles[table.indexKey].push(filePath);
-        } catch (e) {
-          logger.error(e);
         }
+      } catch (e) {
+        logger.error(e);
       }
     }
     await this.ctx.service.github.updateRepo('data/index.json', JSON.stringify(indexFiles));
-  }
-
-  public async updateGitee() {
-    const { logger } = this;
-    const { config } = this.ctx.app;
-    const tables: TableConfig[] = config.shimo.tables;
-    const token = await GiteeClient.getToken(config.gitee.baseUrl, config.gitee.auth);
-    if (!token) {
-      logger.error('Get gitee token error!');
-      return;
-    }
-
-    for (const table of tables) {
-      for (const sheet of table.sheets) {
-        try {
-          const filePath = table.getFilePath(sheet);
-          logger.info(`Gonna get data from shimo for gitee, file=${filePath}, sheet=${sheet}`);
-          let data = this.shimoDataTemp.get(`${filePath}/${sheet}`);
-          if (data === undefined) {
-            data = await this.getFileData(table, sheet);
-            data = await this.ctx.service.dataFormat.format(data, table);
-            this.shimoDataTemp.set(`${filePath}/${sheet}`, data);
-          }
-          if (data.length > 0) {
-            // only update if have data
-            await this.ctx.service.gitee.updateRepo(`data/json/${filePath}`, JSON.stringify(data), token);
-          }
-        } catch (e) {
-          logger.error(e);
-        }
-      }
-    }
-  }
-
-  private async getFileData(tableConfig: TableConfig, sheetName: string): Promise<any> {
-    if (!this.token) {
-      this.token = await this.getToken();
-    }
-    const fileContent = await this.getFileContent(this.token, tableConfig, sheetName);
-    return fileContent;
   }
 
   private async getToken(): Promise<string> {
@@ -124,31 +76,93 @@ export default class ShimoService extends Service {
     });
   }
 
-  private async getFileContent(accessToken: string, tableConfig: TableConfig, sheetName: string): Promise<any> {
+  private async getTableData(table: PreTableConfig): Promise<TableData> {
+
+    const { logger } = this.ctx;
+
+    const tableData: TableData = {
+      guid: table.guid,
+      data: [],
+    };
+    let preTableData: TableData | null = null;
+
+    if (table.preTable) {
+      // get pre table data if exists and flatten
+      preTableData = await this.getTableData(table.preTable);
+    }
+
+    for (const sheet of table.sheets) {
+      try {
+        const sheetData = await this.getSheetContent(table, sheet);
+        tableData.data.push(sheetData);
+      } catch (e) {
+        logger.error(e);
+      }
+    }
+
+    if (table.preTableDetect !== undefined && preTableData) {
+      const preDataArray: RowData[] = [];
+      preTableData.data.forEach(sheet => {
+        preDataArray.push(...sheet.data);
+      });
+      tableData.data.forEach(sheet => {
+        sheet.data.forEach((row, rowIndex, sheet) => {
+          // replace with pre table data
+          if (table.preTableDetect !== undefined) {
+            const pre = preDataArray.find(r => {
+              if (table.preTableDetect) {
+                const preItem = table.preTableDetect(r);
+                const myItem = table.preTableDetect(row);
+                if (!preItem || !myItem) return false;
+                return preItem.value === myItem.value;
+              }
+              return false;
+            });
+            if (pre) {
+              logger.info(`Gonna merge: ${table.preTableDetect(row).value}`);
+              sheet[rowIndex] = pre;
+            }
+          }
+        });
+      });
+    }
+
+    return tableData;
+  }
+
+  private async getSheetContent(tableConfig: PreTableConfig, sheetName: string): Promise<SheetData> {
+
+    if (!this.token) {
+      this.token = await this.getToken();
+    }
+
     let range = '';
     let row = tableConfig.skipRows + 1;
     const minCol = this.getColumnName(tableConfig.skipColumns + 1);
     const maxCol = tableConfig.maxColumn;
     let done = false;
 
-    const names = (await this.getFileContentRange(accessToken, tableConfig.guid,
+    const names = (await this.getFileContentRange(this.token, tableConfig.guid,
       `${sheetName}!${minCol}${tableConfig.nameRow}:${maxCol}${tableConfig.nameRow}`))[0];
-    const types = (await this.getFileContentRange(accessToken, tableConfig.guid,
+    const types = (await this.getFileContentRange(this.token, tableConfig.guid,
       `${sheetName}!${minCol}${tableConfig.typeRow}:${maxCol}${tableConfig.typeRow}`))[0];
-    const defaultValues = (await this.getFileContentRange(accessToken, tableConfig.guid,
+    const defaultValues = (await this.getFileContentRange(this.token, tableConfig.guid,
       `${sheetName}!${minCol}${tableConfig.defaultValueRow}:${maxCol}${tableConfig.defaultValueRow}`))[0];
-    const res: any[] = [];
+    const res: SheetData = {
+      sheetName,
+      data: [],
+    };
     while (!done) {
       range = `${sheetName}!${minCol}${row}:${maxCol}${row + this.rowBatch}`;
       row += this.rowBatch + 1;
-      const values = await this.getFileContentRange(accessToken, tableConfig.guid, range);
+      const values = await this.getFileContentRange(this.token, tableConfig.guid, range);
       for (const row of values) {
         if (!row.some(v => v !== null)) {
           // blank row, all data get done
           done = true;
           break;
         }
-        const rowData: any[] = [];
+        const rowData: RowData = [];
         row.forEach((v, i) => {
           rowData.push({
             key: names[i],
@@ -156,7 +170,7 @@ export default class ShimoService extends Service {
             type: types[i] ?? defaultColumnType,
           });
         });
-        res.push(rowData);
+        res.data.push(rowData);
       }
     }
     return res;

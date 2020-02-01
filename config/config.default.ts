@@ -22,16 +22,16 @@ export default (appInfo: EggAppInfo) => {
     },
   };
 
-  const githubConfig = {
+  config.github = {
+    enable: false,
     token: 'YOUR TOKEN',
     owner: 'wuhan2020',
     repo: 'wuhan2020-test',
     message: 'data-sync',
   };
 
-  config.github = githubConfig;
-
   config.gitee = {
+    enable: false,
     baseUrl: 'https://gitee.com',
     auth: {
 
