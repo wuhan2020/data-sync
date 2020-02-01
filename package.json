@@ -37,6 +37,8 @@
     "shimo-sheet2json": "^1.0.8"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
     "@types/mocha": "^2.2.40",
     "@types/node": "^13.5.2",
     "@types/supertest": "^2.0.0",
