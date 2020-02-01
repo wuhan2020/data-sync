@@ -27,10 +27,14 @@
     "egg": "^2.6.1",
     "egg-scripts": "^2.6.0",
     "http2": "^3.3.7",
+    "leven": "^3.1.0",
     "moment": "^2.24.0",
+    "parse-address-cn": "^1.0.4",
     "pinyin": "^2.9.0",
     "querystring": "^0.2.0",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5",
+    "shimo-sheet2json": "^1.0.8"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.40",
@@ -41,7 +45,7 @@
     "egg-bin": "^4.11.0",
     "egg-ci": "^1.8.0",
     "egg-mock": "^3.16.0",
-    "eslint": "^6.7.2",
+    "eslint": "^6.8.0",
     "eslint-config-egg": "^8.0.0",
     "tslib": "^1.9.0",
     "tslint": "^6.0.0",
