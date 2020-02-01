@@ -13,11 +13,6 @@ export interface TableConfig {
   feParser?: (data: any[], sheet: string) => any;
 }
 
-export const defaultColumnType = 'string';
-export const defaultValidation = (row: any[]): boolean => {
-  return row.some(item => item.key === '审核状态' && item.value !== null);
-};
-
 export function getCellByType(row: any[], type: string): any {
   return row.find(cell => cell.type === type);
 }
@@ -29,3 +24,9 @@ export function getCellByName(row: any[], key: string): any {
 export function getAllCellsByType(row: any[], type: string): any {
   return row.filter(cell => cell.type === type);
 }
+
+export const defaultColumnType = 'string';
+export const defaultValidation = (row: any[]): boolean => {
+  const v = getCellByName(row, '审核状态').value;
+  return v !== null && !v.includes('未');
+};
