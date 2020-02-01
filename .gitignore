@@ -22,3 +22,5 @@ config/**/*.map
 
 !config/config.default.ts
 config/config.*.ts
+
+!lint-staged.config.js

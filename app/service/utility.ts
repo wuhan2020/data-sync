@@ -8,7 +8,7 @@ export default class Utility extends Service {
   /**
    * check the connectivity of a given URL, if http prefix is not assigned, http:// would be append as prefix of the URL
    * @param url given website address
-   * @returns {Promise<any>}
+   * @return {Promise<any>}
    */
   public async checkURLConnectivity(url): Promise<any> {
     return new Promise((resolve, reject) => {
