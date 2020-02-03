@@ -35,6 +35,6 @@ $ npm start
 - Node.js 8.x
 - Typescript 2.8+
 
-## 功能架构图
+## Architecture Diagram
 
 ![arch](http://api.hypertrons.io/umlrenderer/github/wuhan2020/data-sync?path=static/architecture.puml)
