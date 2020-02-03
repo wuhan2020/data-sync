@@ -4,6 +4,7 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "array-bracket-spacing": 0
+		"array-bracket-spacing": 0,
+		"quotes": ["error", "single"]
   }
 }
