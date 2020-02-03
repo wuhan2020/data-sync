@@ -13,6 +13,7 @@ export default class ShimoService extends Service {
     const { config } = this.ctx.app;
     const tables: TableConfig[] = config.shimo.tables;
     const updateFunc = async (path: string, data: any) => {
+      logger.info(`Start to update ${path}`);
       await this.ctx.service.github.updateRepo(path, data);
       await this.ctx.service.gitee.updateRepo(path, data);
     };
@@ -105,7 +106,9 @@ export default class ShimoService extends Service {
       preTableData.data.forEach(sheet => {
         preDataArray.push(...sheet.data);
       });
+      let hitSheet = false;
       tableData.data.forEach(sheet => {
+        if (hitSheet) return;
         sheet.data.forEach((row, rowIndex, sheet) => {
           // replace with pre table data
           if (table.preTableDetect !== undefined) {
@@ -121,9 +124,14 @@ export default class ShimoService extends Service {
             if (pre) {
               logger.info(`Gonna merge: ${table.preTableDetect(row).value}`);
               sheet[rowIndex] = pre;
+              preDataArray.splice(preDataArray.indexOf(pre), 1);
+              hitSheet = true;
             }
           }
         });
+        if (hitSheet) {
+          sheet.data.push(...preDataArray);
+        }
       });
     }
 
