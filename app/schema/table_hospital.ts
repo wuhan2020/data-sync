@@ -5,7 +5,7 @@ import oxbridgeHospitalTable from './table_oxbridge';
 const hospitalTable: TableConfig = {
   guid: 'k399pHyt6HKvW6xR',
   indexKey: 'hospital',
-  sheets: [ '武汉市', '黄石市', '十堰市', '宜昌市', '襄阳市', '鄂州市', '荆门市', '孝感市', '荆州市', '黄冈市', '咸宁市', '随州市', '施恩土家族苗族自治州', '仙桃市', '潜江市', '天门市' ],
+  sheets: [ '武汉市', '黄石市', '十堰市', '宜昌市', '襄阳市', '鄂州市', '荆门市', '孝感市', '荆州市', '黄冈市', '咸宁市', '随州市', '恩施土家族苗族自治州', '仙桃市', '潜江市', '天门市' ],
   skipRows: 5,
   skipColumns: 1,
   nameRow: 3,
