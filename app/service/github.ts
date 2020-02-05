@@ -1,5 +1,5 @@
 import { Service } from 'egg';
-import * as Octokit from '@octokit/rest';
+import { Octokit } from '@octokit/rest';
 import * as moment from 'moment';
 import { EOL } from 'os';
 

@@ -1,5 +1,3 @@
 module.exports = {
-  '*.ts': () => {
-    return 'npm run lint';
-  },
-};
+  '**/*.ts?(x)': filenames => (filenames.length > 10 ? 'eslint .' : `eslint ${filenames.join(' ')}`)
+}
