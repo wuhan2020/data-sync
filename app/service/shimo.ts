@@ -42,7 +42,7 @@ export default class ShimoService extends Service {
         logger.error(e);
       }
     }
-    await this.ctx.service.github.updateRepo('data/index.json', JSON.stringify(indexFiles));
+    await updateFunc('data/index.json', JSON.stringify(indexFiles));
   }
 
   private async getToken(): Promise<string> {
