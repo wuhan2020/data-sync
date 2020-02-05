@@ -38,7 +38,9 @@ export default class DataFormatService extends Service {
             return null;
           }
         };
-        newRow.push(parse());
+        const newCell = parse();
+        if (newCell && newCell.value === null) newCell.value = '';
+        newRow.push(newCell);
       });
       if (newRow.includes(null)) {
         return null;
