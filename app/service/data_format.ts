@@ -6,53 +6,52 @@ type FormatFunc = (item: any) => any;
 export default class DataFormatService extends Service {
 
   public async format(data: any[], tableConfig: TableConfig): Promise<any> {
-    data = data.filter(item => {
-      return tableConfig.validation ? tableConfig.validation(item) : defaultValidation(item);
-    });
-    data = data.map(row => {
-      const newRow: any[] = [];
-      row.forEach((cell: any) => {
-        const parse = () => {
-          if (!cell.type) {
-            return cell;
-          }
-          let type = cell.type;
-          if (cell.type.startsWith('enum')) {
-            // enum{a,b}
-            type = 'enum';
-          } else if (cell.type.startsWith('supply')) {
-            // supply|specification
-            type = 'supply';
-          } else if (cell.type.startsWith('bool')) {
-            // bool{是,否}
-            type = 'bool';
-          }
-          const formatter = DataFormatService.fomatters.get(type);
-          if (!formatter) {
-            return cell;
-          }
-          try {
-            const i = formatter(cell);
-            return i ? i : cell;
-          } catch (e) {
-            return null;
-          }
-        };
-        const newCell = parse();
-        if (newCell && newCell.value === null) newCell.value = '';
-        newRow.push(newCell);
-      });
-      if (newRow.includes(null)) {
-        return null;
-      }
-      return newRow;
-    });
-    data = data.filter(row => row !== null);
-    return data;
+    if (!data || data.length === 0) {
+      return [];
+    }
+    return data
+      .filter(item => (tableConfig.validation ? tableConfig.validation(item) : defaultValidation(item)))
+      .map((row, i) => this.parseRow(row, tableConfig, i))
+      .filter(row => !!row);
+
+  }
+
+  private parseRow(row: any[], tableConfig: TableConfig, rowNum: number) {
+    return row.map((cell, cellNum) => this.parseCell(cell, tableConfig, rowNum, cellNum));
+  }
+
+  private parseCell(cell: any, tableConfig: TableConfig, rowNum: number, cellNum: number) {
+    if (!cell.type) {
+      return cell;
+    }
+    let type = cell.type;
+    if (cell.type.startsWith('enum')) {
+      // enum{a,b}
+      type = 'enum';
+    } else if (cell.type.startsWith('supply')) {
+      // supply|specification
+      type = 'supply';
+    } else if (cell.type.startsWith('bool')) {
+      // bool{是,否}
+      type = 'bool';
+    }
+    const formatter = DataFormatService.fomatters.get(type);
+    if (!formatter) {
+      return cell;
+    }
+    try {
+      const i = formatter(cell);
+      return i ? i : cell;
+    } catch (e) {
+      this.logger.error(`table[guid: ${tableConfig.guid}, indexKey:${tableConfig.indexKey}]:row[${rowNum}]:cell[${cellNum}]:err:[${JSON.stringify(e)}]`);
+
+      return null;
+    }
+
   }
 
   public static addressFormatter: FormatFunc = item => {
-    item.coord = [ 0, 0 ];
+    item.coord = [0, 0];
     return item;
   }
 
@@ -63,7 +62,7 @@ export default class DataFormatService extends Service {
       return item;
     }
     v = v.toString();
-    const contacts: {name: string; tel: string}[] = [];
+    const contacts: { name: string; tel: string }[] = [];
     v.split('：').join(':').split('|').
       forEach(contact => {
         const s = contact.trim().split(':');
