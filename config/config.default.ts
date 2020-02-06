@@ -64,6 +64,13 @@ export default (appInfo: EggAppInfo) => {
     ],
   };
 
+  config.qiniu = {
+    enable: false,
+    accessKey: 'YOUR ACCESSKEY',
+    secretKey: 'YOUR SECRETKEY',
+    bucket: 'BUCKET',
+  };
+
   // added by Yuan
   // Gaode Map API Key
   config.gaode = {

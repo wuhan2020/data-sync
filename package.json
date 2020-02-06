@@ -31,11 +31,11 @@
     "moment": "^2.24.0",
     "parse-address-cn": "^1.0.4",
     "pinyin": "^2.9.0",
+    "qiniu": "^7.3.0",
     "querystring": "^0.2.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
-    "requestretry": "^4.1.0",
-    "shimo-sheet2json": "^1.0.8"
+    "requestretry": "^4.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",

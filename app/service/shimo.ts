@@ -18,6 +18,7 @@ export default class ShimoService extends Service {
       logger.info(`Start to update ${path}`);
       await this.ctx.service.github.updateRepo(path, data);
       await this.ctx.service.gitee.updateRepo(path, data);
+      await this.ctx.service.qiniu.uploadFile(path, data);
     };
     const indexFiles = {};
     for (const table of tables) {
