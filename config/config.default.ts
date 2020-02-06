@@ -6,6 +6,7 @@ import donationTable from '../app/schema/table_donation';
 import clinicTable from '../app/schema/table_clinic';
 import enterpriseDonationTable from '../app/schema/table_enterprise_donation';
 import factoryTable from '../app/schema/table_factory';
+import isaaclinApi from '../app/external_api/api_isaaclin';
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -69,6 +70,12 @@ export default (appInfo: EggAppInfo) => {
     accessKey: 'YOUR ACCESSKEY',
     secretKey: 'YOUR SECRETKEY',
     bucket: 'BUCKET',
+  };
+
+  config.api = {
+    apis: [
+      isaaclinApi,
+    ],
   };
 
   // added by Yuan
