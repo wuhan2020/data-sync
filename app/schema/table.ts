@@ -36,7 +36,7 @@ export const defaultValidation = (row: any[]): boolean => {
   return v !== null && !v.includes('未');
 };
 
-export type ColumnTypes = 'string' | 'int' | 'float' | 'url' | 'address' | 'enum' | 'supply' | 'contact' | 'date';
+export type ColumnTypes = 'string' | 'int' | 'float' | 'url' | 'address' | 'enum' | 'supply' | 'contact' | 'date' | 'supplies';
 
 export interface TableData {
   guid: string;

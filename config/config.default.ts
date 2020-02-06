@@ -5,6 +5,7 @@ import logisticalTable from '../app/schema/table_logistical';
 import donationTable from '../app/schema/table_donation';
 import clinicTable from '../app/schema/table_clinic';
 import enterpriseDonationTable from '../app/schema/table_enterprise_donation';
+import factoryTable from '../app/schema/table_factory';
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -59,6 +60,7 @@ export default (appInfo: EggAppInfo) => {
       donationTable,
       clinicTable,
       enterpriseDonationTable,
+      factoryTable,
     ],
   };
 

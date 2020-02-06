@@ -25,6 +25,9 @@ export default class DataFormatService extends Service {
       return cell;
     }
     let type = cell.type;
+    if (cell.value === null) {
+      cell.value = '';
+    }
     if (cell.type.startsWith('enum')) {
       // enum{a,b}
       type = 'enum';
@@ -51,13 +54,13 @@ export default class DataFormatService extends Service {
   }
 
   public static addressFormatter: FormatFunc = item => {
-    item.coord = [0, 0];
+    item.coord = [ 0, 0 ];
     return item;
   }
 
   public static contactFormatter: FormatFunc = item => {
     let v: any = item.value;
-    if (v === null) {
+    if (v === '') {
       item.value = [];
       return item;
     }
@@ -87,7 +90,7 @@ export default class DataFormatService extends Service {
   }
 
   public static intFormatter: FormatFunc = item => {
-    if (!item.value) {
+    if (item.value === '') {
       item.value = 0;
     }
     try {
@@ -103,7 +106,7 @@ export default class DataFormatService extends Service {
   }
 
   public static floatFormatter: FormatFunc = item => {
-    if (!item.value) {
+    if (item.value === '') {
       item.value = 0;
     }
     try {
@@ -119,7 +122,7 @@ export default class DataFormatService extends Service {
   }
 
   public static dateFormatter: FormatFunc = item => {
-    if (item.value !== null) {
+    if (item.value !== '') {
       if (typeof item.value === 'number') {
         item.value = DataFormatService.fromOADate(item.value);
       } else {
@@ -130,7 +133,7 @@ export default class DataFormatService extends Service {
   }
 
   public static urlFormatter: FormatFunc = item => {
-    if (item.value === null) {
+    if (item.value === '') {
       return item;
     }
     // TODO 检查 URL 连通性
@@ -146,7 +149,7 @@ export default class DataFormatService extends Service {
     if (ts.length > 1) {
       item.specification = ts[1];
     }
-    if (item.value === null) {
+    if (item.value === '') {
       return item;
     }
     const vs = item.value.toString().split('|');
@@ -161,9 +164,38 @@ export default class DataFormatService extends Service {
     return item;
   }
 
+  public static suppliesFormatter: FormatFunc = item => {
+    if (item.value === '') {
+      item.value = [];
+      return item;
+    }
+    const value: any[] = [];
+    const vs: string[] = item.value.toString().split('|');
+    vs.forEach(v => {
+      try {
+        const arr = v.split(':');
+        if (arr.length === 1) {
+          value.push({
+            specification: arr[0],
+            value: 1,
+          });
+        } else if (arr.length === 2) {
+          value.push({
+            specification: arr[0],
+            value: parseInt(arr[1]),
+          });
+        }
+      } catch {
+        throw new Error(`Supply value error, value=${item.value}`);
+      }
+    });
+    item.value = value;
+    return item;
+  }
+
   private static enumRegex = /^enum{(.*)}/;
   public static enumFormatter: FormatFunc = item => {
-    if (item.value === null) {
+    if (item.value === '') {
       return item;
     }
     const res = DataFormatService.enumRegex.exec(item.type);
@@ -219,6 +251,10 @@ export default class DataFormatService extends Service {
     [
       'bool', // 类型
       DataFormatService.boolFormatter,
+    ],
+    [
+      'supplies', // 多类型物资
+      DataFormatService.suppliesFormatter,
     ],
   ]);
 

@@ -5,7 +5,7 @@ import { TableConfig, defaultColumnType, PreTableConfig, RowData, SheetData, Tab
 export default class ShimoService extends Service {
 
   private baseUrl = 'https://api.shimo.im';
-  private rowBatch = 20;
+  private rowBatch = 100;
   private maxRetryTime = 5;
   private token: string;
 

@@ -22,7 +22,7 @@ describe('test/app/service/data_format.test.js', () => {
 
     it('should return 0 if no value given', () => {
       const v = DataFormatService.intFormatter({
-        value: null,
+        value: '',
       });
       assert(v.value === 0);
     });
@@ -103,14 +103,26 @@ describe('test/app/service/data_format.test.js', () => {
       assert.deepEqual(v.value, check);
     });
 
+  });
+
+  describe('supplies', () => {
     it('a real case', () => {
-      const valueStr = '王平： 13997712859 | 申西华：13872631977 | 廖勇：13986828368 | 代金枝： 13972001441';
-      const v = DataFormatService.contactFormatter({
+      const valueStr = '一次性医用口罩:100|N95 口罩';
+      const check = [
+        {
+          specification: '一次性医用口罩',
+          value: 100,
+        },
+        {
+          specification: 'N95 口罩',
+          value: 1,
+        },
+      ];
+      const v = DataFormatService.suppliesFormatter({
         value: valueStr,
       });
-      console.log(v);
+      assert.deepEqual(v.value, check);
     });
-
   });
 
   describe('supply', () => {
