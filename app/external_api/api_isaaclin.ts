@@ -1,16 +1,18 @@
 import { ApiConfig } from './api';
 
+const baseUrl = 'https://lab.ahusmart.com/nCoV/api/';
+
 const isaaclinApi: ApiConfig[] = [
   {
-    url: 'https://lab.isaaclin.cn/nCoV/api/area',
+    url: `${baseUrl}area`,
     getFilePath: () => 'map-viz/current.json',
   },
   {
-    url: 'https://lab.isaaclin.cn/nCoV/api/area?latest=0',
+    url: `${baseUrl}area?latest=0`,
     getFilePath: () => 'map-viz/history.json',
   },
   {
-    url: 'https://lab.isaaclin.cn/nCoV/api/overall?latest=0',
+    url: `${baseUrl}overall?latest=0`,
     getFilePath: () => 'map-viz/overall.json',
   },
 ];

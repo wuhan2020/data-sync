@@ -38,12 +38,16 @@ export default class GithubService extends Service {
       if (err.name !== 'HttpError') { throw err; }
     }
     logger.info(`Goona update file ${path}`);
-    await octokit.repos.createOrUpdateFile({
-      ...options,
-      path,
-      message: `[${config.message}] ${time}`,
-      content: newContent,
-      sha,
-    });
+    try {
+      await octokit.repos.createOrUpdateFile({
+        ...options,
+        path,
+        message: `[${config.message}] ${time}`,
+        content: newContent,
+        sha,
+      });
+    } catch (e) {
+      logger.error(e);
+    }
   }
 }
