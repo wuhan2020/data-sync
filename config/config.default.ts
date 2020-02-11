@@ -6,6 +6,7 @@ import donationTable from '../app/schema/table_donation';
 import clinicTable from '../app/schema/table_clinic';
 import enterpriseDonationTable from '../app/schema/table_enterprise_donation';
 import factoryTable from '../app/schema/table_factory';
+import patientDetailTable from '../app/schema/table_patient_detail';
 import isaaclinApi from '../app/external_api/api_isaaclin';
 
 export default (appInfo: EggAppInfo) => {
@@ -62,6 +63,7 @@ export default (appInfo: EggAppInfo) => {
       clinicTable,
       enterpriseDonationTable,
       factoryTable,
+      patientDetailTable,
     ],
   };
 

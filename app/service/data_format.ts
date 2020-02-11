@@ -46,7 +46,7 @@ export default class DataFormatService extends Service {
       const i = formatter(cell);
       return i ? i : cell;
     } catch (e) {
-      this.logger.error(`table[guid: ${tableConfig.guid}, indexKey:${tableConfig.indexKey}]:row[${rowNum}]:cell[${cellNum}]:err:[${JSON.stringify(e)}]`);
+      this.logger.error(`table[guid:${tableConfig.guid}, indexKey:${tableConfig.indexKey}]:row[${rowNum}]:cell[${cellNum}]:err:[${e.message}]`);
 
       return null;
     }

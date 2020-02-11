@@ -6,7 +6,8 @@ export default class ShimoService extends Service {
 
   private baseUrl = 'https://api.shimo.im';
   private rowBatch = 100;
-  private maxRetryTime = 5;
+  private maxRetryTime = 10;
+  private retryDelayTime = 3000;
   private token: string;
 
   public async update() {
@@ -21,15 +22,19 @@ export default class ShimoService extends Service {
       await this.ctx.service.qiniu.uploadFile(path, data);
     };
     const indexFiles = {};
+    const dataCount: any[] = [];
     for (const table of tables) {
       if (!indexFiles[table.indexKey]) {
         indexFiles[table.indexKey] = [];
       }
       const tableData = await this.getTableData(table);
       try {
+        const d = { table: table.indexKey, count: 0, confirmCount: 0 };
         for (const sheetData of tableData.data) {
           const data = await this.ctx.service.dataFormat.format(sheetData.data, table);
           const filePath = table.getFilePath(sheetData.sheetName);
+          d.count += sheetData.data.length;
+          d.confirmCount += data.length;
           if (data.length > 0) {
             // only update if have data
             await updateFunc(`data/json/${filePath}`, JSON.stringify(data));
@@ -39,11 +44,13 @@ export default class ShimoService extends Service {
           }
           indexFiles[table.indexKey].push(filePath);
         }
+        dataCount.push(d);
       } catch (e) {
         logger.error(e);
       }
     }
     await updateFunc('data/index.json', JSON.stringify(indexFiles));
+    logger.info(dataCount);
   }
 
   private async getToken(): Promise<string> {
@@ -100,12 +107,20 @@ export default class ShimoService extends Service {
     const minCol = this.getColumnName(table.skipColumns + 1);
     const maxCol = table.maxColumn;
     const firstSheet = table.sheets[0];
-    const names = (await this.getSheetContentRange(this.token, table.guid,
-      `${firstSheet}!${minCol}${table.nameRow}:${maxCol}${table.nameRow}`))[0];
     const types = (await this.getSheetContentRange(this.token, table.guid,
       `${firstSheet}!${minCol}${table.typeRow}:${maxCol}${table.typeRow}`))[0];
-    const defaultValues = (await this.getSheetContentRange(this.token, table.guid,
-      `${firstSheet}!${minCol}${table.defaultValueRow}:${maxCol}${table.defaultValueRow}`))[0];
+    const names = (await this.getSheetContentRange(this.token, table.guid,
+      `${firstSheet}!${minCol}${table.nameRow}:${maxCol}${table.nameRow}`))[0];
+    let defaultValues: any[] = [];
+    if (table.defaultValueRow > 0) {
+      defaultValues = (await this.getSheetContentRange(this.token, table.guid,
+        `${firstSheet}!${minCol}${table.defaultValueRow}:${maxCol}${table.defaultValueRow}`))[0];
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for (const _ of names) {
+        defaultValues.push('');
+      }
+    }
 
     logger.info('Get names, types, values done.');
 
@@ -204,6 +219,7 @@ export default class ShimoService extends Service {
   }
 
   private async getSheetContentRange(accessToken: string, guid: string, range: string): Promise<any[][]> {
+    this.logger.info(range);
     return new Promise((resolve, reject) => {
       const options = {
         method: 'GET',
@@ -215,7 +231,7 @@ export default class ShimoService extends Service {
           Authorization: `bearer ${accessToken}`,
         },
         maxAttempts: this.maxRetryTime,
-        retryDelay: 5000,
+        retryDelay: this.retryDelayTime,
         retryStrategy: (err, _, body) => {
           return (err && err.message === 'ESOCKETTIMEDOUT') ||
             !body ||
