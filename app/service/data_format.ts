@@ -5,22 +5,25 @@ type FormatFunc = (item: any) => any;
 
 export default class DataFormatService extends Service {
 
-  public async format(data: any[], tableConfig: TableConfig): Promise<any> {
+  private errorInfo: any[] = [];
+
+  public async format(data: any[], tableConfig: TableConfig, sheetName: string): Promise<any[]> {
     if (!data || data.length === 0) {
       return [];
     }
-    return data
+    this.errorInfo = [];
+    const res = data
       .filter(item => (tableConfig.validation ? tableConfig.validation(item) : defaultValidation(item)))
-      .map((row, i) => this.parseRow(row, tableConfig, i))
+      .map((row, i) => this.parseRow(row, tableConfig, i, sheetName))
       .filter(row => !!row);
-
+    return [ res, this.errorInfo ];
   }
 
-  private parseRow(row: any[], tableConfig: TableConfig, rowNum: number) {
-    return row.map((cell, cellNum) => this.parseCell(cell, tableConfig, rowNum, cellNum));
+  private parseRow(row: any[], tableConfig: TableConfig, rowNum: number, sheetName: string) {
+    return row.map((cell, cellNum) => this.parseCell(cell, tableConfig, rowNum, cellNum, sheetName));
   }
 
-  private parseCell(cell: any, tableConfig: TableConfig, rowNum: number, cellNum: number) {
+  private parseCell(cell: any, tableConfig: TableConfig, rowNum: number, cellNum: number, sheetName: string) {
     if (!cell.type) {
       return cell;
     }
@@ -47,7 +50,12 @@ export default class DataFormatService extends Service {
       return i ? i : cell;
     } catch (e) {
       this.logger.error(`table[guid:${tableConfig.guid}, indexKey:${tableConfig.indexKey}]:row[${rowNum}]:cell[${cellNum}]:err:[${e.message}]`);
-
+      this.errorInfo.push({
+        guid: tableConfig.guid,
+        sheetName,
+        cell: `${this.ctx.service.shimo.getColumnName(tableConfig.skipColumns + cellNum + 1)}${tableConfig.skipRows + rowNum + 1}`,
+        err: e.message,
+      });
       return null;
     }
 
@@ -66,7 +74,11 @@ export default class DataFormatService extends Service {
     }
     v = v.toString();
     const contacts: { name: string; tel: string }[] = [];
-    v.split('：').join(':').split('|').
+    v.split('：').
+      join(':').
+      split('｜').
+      join('|').
+      split('|').
       forEach(contact => {
         const s = contact.trim().split(':');
         if (s[0].trim() === '') return;
@@ -141,7 +153,7 @@ export default class DataFormatService extends Service {
   }
 
   public static supplyFormatter: FormatFunc = item => {
-    const ts = item.type.split('|');
+    const ts = item.type.split('｜').join('|').split('|');
     if (ts[0].trim() !== 'supply') {
       throw new Error(`Supply type error, type=${item.type}`);
     }
@@ -152,7 +164,8 @@ export default class DataFormatService extends Service {
     if (item.value === '') {
       return item;
     }
-    const vs = item.value.toString().split('|');
+    const vs = item.value.toString().split('｜').join('|').
+      split('|');
     try {
       item.value = parseInt(vs[0].trim());
     } catch {
@@ -170,7 +183,8 @@ export default class DataFormatService extends Service {
       return item;
     }
     const value: any[] = [];
-    const vs: string[] = item.value.toString().split('|');
+    const vs: string[] = item.value.toString().split('｜').join('|').
+      split('|');
     vs.forEach(v => {
       try {
         const arr = v.split(':');

@@ -103,6 +103,28 @@ describe('test/app/service/data_format.test.js', () => {
       assert.deepEqual(v.value, check);
     });
 
+    it('a real case', () => {
+      const valueStr = '张老师：18186011616｜周老师：13986572280｜胡老师：13451065900';
+      const check = [
+        {
+          name: '张老师',
+          tel: '18186011616',
+        },
+        {
+          name: '周老师',
+          tel: '13986572280',
+        },
+        {
+          name: '胡老师',
+          tel: '13451065900',
+        },
+      ];
+      const v = DataFormatService.contactFormatter({
+        value: valueStr,
+      });
+      assert.deepEqual(v.value, check);
+    });
+
   });
 
   describe('supplies', () => {

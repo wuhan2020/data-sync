@@ -23,6 +23,7 @@ export default class ShimoService extends Service {
     };
     const indexFiles = {};
     const dataCount: any[] = [];
+    const errorInfo: any[] = [];
     for (const table of tables) {
       if (!indexFiles[table.indexKey]) {
         indexFiles[table.indexKey] = [];
@@ -31,7 +32,8 @@ export default class ShimoService extends Service {
       try {
         const d = { table: table.indexKey, count: 0, confirmCount: 0 };
         for (const sheetData of tableData.data) {
-          const data = await this.ctx.service.dataFormat.format(sheetData.data, table);
+          const [ data, err ] = await this.ctx.service.dataFormat.format(sheetData.data, table, sheetData.sheetName);
+          errorInfo.push(...err);
           const filePath = table.getFilePath(sheetData.sheetName);
           d.count += sheetData.data.length;
           d.confirmCount += data.length;
@@ -49,6 +51,7 @@ export default class ShimoService extends Service {
         logger.error(e);
       }
     }
+    await updateFunc('data/error.json', JSON.stringify(errorInfo));
     await updateFunc('data/index.json', JSON.stringify(indexFiles));
     logger.info(dataCount);
   }
@@ -207,7 +210,7 @@ export default class ShimoService extends Service {
     return res;
   }
 
-  private getColumnName(num: number): string {
+  public getColumnName(num: number): string {
     const numToChar = (n: number): string => {
       n = Math.floor(n % 26);
       if (n === 0) {
