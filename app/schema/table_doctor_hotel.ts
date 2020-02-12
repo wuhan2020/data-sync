@@ -24,15 +24,17 @@ const docHotelTable: TableConfig = {
           address: getCellByName(row, '酒店地址').value,
           maximum_rooms: getCellByName(row, '酒店可提供房间数').value,
           maximum_guests: getCellByName(row, '酒店可接待人数').value,
-          contacts:
-            [{
+          contacts: getCellByName(row, '联系方式').value.map(t => {
+            return {
               name: getCellByName(row, '联系人').value,
-              tel: getCellByName(row, '联系方式').value,
-            }],
+              tel: t.tel,
+            };
+          }),
           url: getCellByName(row, '信息发布源链接').value,
           remark: getCellByName(row, '备注').value,
         };
-      } catch {
+      } catch (e) {
+        console.log(e);
         return null;
       }
     }).filter(item => item !== null);
