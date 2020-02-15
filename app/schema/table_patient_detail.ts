@@ -4,7 +4,7 @@ import pinyin = require('pinyin');
 const patientDetailTable: TableConfig = {
   guid: '6QQ3j8DKDqtCwyDV',
   indexKey: 'patient_detail',
-  sheets: [ '1安徽', '32香港' ],
+  sheets: [ '1安徽', '2河南', '3浙江', '4江苏', '5广东', '7上海', '8河北', '9陕西', '11山东', '12山西', '13重庆', '14福建', '15天津', '16云南', '18广西', '21辽宁', '23内蒙古', '25甘肃', '32香港' ],
   skipRows: 3,
   skipColumns: 0,
   nameRow: 3,

@@ -4,7 +4,7 @@ import pinyin = require('pinyin');
 const docHotelTable: TableConfig = {
   guid: 'Hd9C3QytrJK3RWxG',
   indexKey: 'doctor_hotel',
-  sheets: [ '武汉市', '黄石市', '十堰市', '宜昌市', '襄阳市', '鄂州市', '荆门市', '孝感市', '荆州市', '黄冈市', '咸宁市', '随州市', '恩施土家族苗族自治州', '仙桃市', '潜江市', '天门市' ],
+  sheets: [ '武汉市', '黄石市', '十堰市', '宜昌市', '襄阳市', '鄂州市', '荆门市', '孝感市', '荆州市', '黄冈市', '咸宁市', '随州市', '恩施土家族苗族自治州' ],
   skipRows: 4,
   skipColumns: 1,
   nameRow: 2,
