@@ -1,0 +1,15 @@
+{
+  "name": "egg-datacache",
+  "version": "0.0.1",
+  "description": "data cache",
+  "eggPlugin" : {
+    "name": "datacache"
+  },
+  "keywords": [
+    "egg",
+    "data",
+    "cache"
+  ],
+  "author": "yuan",
+  "license": "ISC"
+}

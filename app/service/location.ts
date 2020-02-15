@@ -4,7 +4,6 @@ import leven from 'leven';
 
 export default class LocationService extends Service {
 
-  private dataCache = new Map();
   private STRING_SIMILARITY_LEVEL = 0.75;
   private MAXIMUM_ADDR_LENGTH = 84;
   private debug = false;
@@ -64,11 +63,11 @@ export default class LocationService extends Service {
 
             list.push(place_info);
             const addr_obj = AddressParser.parseAddress(address);
-            if (typeof (addr_obj.name) !== 'undefined' && addr_obj.name !== '' && !this.dataCache.has(addr_obj.name)) {
+            if (typeof (addr_obj.name) !== 'undefined' && addr_obj.name !== '' && !this.app.datacache.hasKey(addr_obj.name)) {
               // cache data
               // note: only the first data in the list would be cached
               if (this.debug) { console.log('addr_obj=' + JSON.stringify(addr_obj)); }
-              this.dataCache.set(addr_obj.name, place_info);
+              this.app.datacache.setData(addr_obj.name, place_info);
             }
           }
           const result = {
@@ -146,10 +145,10 @@ export default class LocationService extends Service {
               longitude: _lng,
               latitude: _lat,
             };
-            if (typeof (addr_parsed.name) !== 'undefined' && addr_parsed.name !== '' && !this.dataCache.has(addr_parsed.name)) {
+            if (typeof (addr_parsed.name) !== 'undefined' && addr_parsed.name !== '' && !this.app.datacache.hasKey(addr_parsed.name)) {
               // cache data
               if (this.debug) { console.log('addr_obj=' + JSON.stringify(addr_parsed)); }
-              this.dataCache.set(addr_parsed.name, place_info);
+              this.app.datacache.setData(addr_parsed.name, place_info);
             }
 
             const result = {
@@ -183,26 +182,26 @@ export default class LocationService extends Service {
    * @return {PlaceInfo} contains address, province, city, district, latitude, longitude
    */
   public getLocationFromCache(addr) {
-    if (this.dataCache.has(addr)) {
-      return this.dataCache.get(addr);
+    if (this.app.datacache.hasKey(addr)) {
+      return this.app.datacache.getDataByKey(addr);
     }
+
     // traverse key list of data cache to find similar addresses
     // use 'leven' to compare address strings.
     // similarity level larger than STRING_SIMILARITY_LEVEL should be considered as similar addresses.
     // use 'parse-address-cn' to parse plain address string
     const addr_obj = AddressParser.parseAddress(addr);
     const addr_detail = addr_obj.name;// omit province and city, only compare detail address
-    const keys = this.dataCache.keys();
+    const keys = this.app.datacache.getKeys();
     for (const k of keys) {
       if (this.compareAddressStrings(addr_detail, k)) {
-        return this.dataCache.get(k);
+        return this.app.datacache.getDataByKey(k);
       }
       continue;
 
     }
 
     return null;
-
 
   }
 
