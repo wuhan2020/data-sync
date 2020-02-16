@@ -12,7 +12,7 @@ const docHotelTable: TableConfig = {
   defaultValueRow: 4,
   maxColumn: 'L',
   getFilePath: (sheet: string) => `doctor_hotel/hubei/${pinyin(sheet, { style: pinyin.STYLE_NORMAL }).join('')}.json`,
-  feParser: (data: any[], sheet: string) => {
+  feParser: async (data: any[], sheet: string) => {
     return data.map((row, id) => {
       try {
         return {

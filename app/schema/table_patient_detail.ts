@@ -1,10 +1,11 @@
 import { TableConfig, getCellByName } from './table';
 import pinyin = require('pinyin');
+import { Context } from 'egg';
 
 const patientDetailTable: TableConfig = {
   guid: '6QQ3j8DKDqtCwyDV',
   indexKey: 'patient_detail',
-  sheets: [ '1安徽', '2河南', '3浙江', '4江苏', '5广东', '7上海', '8河北', '9陕西', '11山东', '12山西', '13重庆', '14福建', '15天津', '16云南', '18广西', '21辽宁', '23内蒙古', '25甘肃', '32香港' ],
+  sheets: [ '18广西', '1安徽', '2河南', '3浙江', '4江苏', '5广东', '7上海', '8河北', '9陕西', '11山东', '12山西', '13重庆', '14福建', '15天津', '16云南', '21辽宁', '23内蒙古', '25甘肃', '32香港' ],
   skipRows: 3,
   skipColumns: 0,
   nameRow: 3,
@@ -12,8 +13,8 @@ const patientDetailTable: TableConfig = {
   defaultValueRow: -1,
   maxColumn: 'AD',
   getFilePath: (sheet: string) => `patient_detail/${pinyin(sheet, { style: pinyin.STYLE_NORMAL }).join('')}.json`,
-  feParser: (data: any[]) => {
-    const res: any[] = [];
+  feParser: async (data: any[], sheetName: string, ctx: Context) => {
+    let res: any[] = [];
     let current: any = null;
     const addTravelAndEventData = (rowData: any, row: any) => {
       if ([ '时间', '出行方式', '车次/车厢/座位', '起始（上车）地', '目的（下车）地' ].some(col => getCellByName(row, col).value !== '')) {
@@ -72,7 +73,38 @@ const patientDetailTable: TableConfig = {
         console.log(e);
       }
     });
-    return res.filter(row => row.status === '已审核');
+    const getCoord = async (addr: string): Promise<any> => {
+      if (addr.trim() === '') return null;
+      while (!Number.isNaN(parseInt(addr.charAt(0)))) {
+        addr = addr.substring(1);
+      }
+      if (!ctx.app.datacache.hasKey(addr)) {
+        const coordRes = await ctx.service.location.retrieveCoordinateViaGD(addr) as any;
+        let coord: any = null;
+        if (coordRes && coordRes.list && coordRes.list.length > 0) {
+          coord = {
+            province: coordRes.list[0].province,
+            city: coordRes.list[0].city,
+            district: coordRes.list[0].district,
+            long: coordRes.list[0].longitude,
+            lat: coordRes.list[0].latitude,
+          };
+        } else {
+          console.log('Coord not found for ', addr, ', res=', coordRes);
+        }
+        ctx.app.datacache.setData(addr, coord);
+      }
+      return ctx.app.datacache.getDataByKey(addr);
+    };
+    res = res.filter(row => row.status === '已审核');
+    await Promise.all(res.map(async item => {
+      const confirmHospital = sheetName + item.confirmHospital;
+      item.confirmHospital = {
+        addr: item.confirmHospital,
+        coord: await getCoord(confirmHospital),
+      };
+    }));
+    return res;
   },
   validation: () => true,
 };

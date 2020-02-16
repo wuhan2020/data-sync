@@ -11,7 +11,7 @@ const donationTable: TableConfig = {
   defaultValueRow: 4,
   maxColumn: 'O',
   getFilePath: () => 'donation/data.json',
-  feParser: (data: any[]) => {
+  feParser: async (data: any[]) => {
     return data.map((row, id) => {
       const accountNames = getCellByName(row, '账户名').value;
       const bankNames = getCellByName(row, '开户行').value;

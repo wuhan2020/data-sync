@@ -78,11 +78,11 @@ export default class LocationService extends Service {
           return result;
 
         } catch (e) {
-          logger.error('encountered error while parsing response data, msg:' + e.toString());
+          logger.error('encountered error while parsing response data, msg:' + e.message);
           return null;
         }
       } else {
-
+        logger.error(response);
         const result = {
           code: 500,
           msg: 'encountered error while requesting geocoding service from Gaode Map Engine, msg:' + response.toString(),
@@ -90,7 +90,6 @@ export default class LocationService extends Service {
         return result;
       }
     }
-
 
   }
 
@@ -172,7 +171,6 @@ export default class LocationService extends Service {
         }
       }
     }
-
 
   }
 

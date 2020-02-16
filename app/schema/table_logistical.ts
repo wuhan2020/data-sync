@@ -11,7 +11,7 @@ const logisticalTable: TableConfig = {
   defaultValueRow: 4,
   maxColumn: 'J',
   getFilePath: () => 'logistical/data.json',
-  feParser: (data: any[]) => {
+  feParser: async (data: any[]) => {
     return data.map((row, id) => {
       return {
         id,

@@ -7,7 +7,8 @@ export default class ShimoService extends Service {
   private baseUrl = 'https://api.shimo.im';
   private rowBatch = 100;
   private maxRetryTime = 10;
-  private retryDelayTime = 3000;
+  private retryDelayTime = 2000;
+  private requestTimeout = 30000;
   private token: string;
 
   public async update() {
@@ -41,7 +42,7 @@ export default class ShimoService extends Service {
             // only update if have data
             await updateFunc(`data/json/${filePath}`, JSON.stringify(data));
             if (table.feParser) {
-              await updateFunc(`data/fe/${filePath}`, JSON.stringify(table.feParser(data, sheetData.sheetName)));
+              await updateFunc(`data/fe/${filePath}`, JSON.stringify(await table.feParser(data, sheetData.sheetName, this.ctx)));
             }
           }
           indexFiles[table.indexKey].push(filePath);
@@ -235,6 +236,7 @@ export default class ShimoService extends Service {
         },
         maxAttempts: this.maxRetryTime,
         retryDelay: this.retryDelayTime,
+        timeout: this.requestTimeout,
         retryStrategy: (err, _, body) => {
           return (err && err.message === 'ESOCKETTIMEDOUT') ||
             !body ||

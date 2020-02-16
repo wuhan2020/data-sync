@@ -11,7 +11,7 @@ const tavelHotelTable: TableConfig = {
   defaultValueRow: 5,
   maxColumn: 'J',
   getFilePath: () => 'travel_hotel/data.json',
-  feParser: (data: any[]) => {
+  feParser: async (data: any[]) => {
     return data.map((row, id) => {
       return {
         id,

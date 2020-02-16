@@ -11,7 +11,7 @@ const factoryTable: TableConfig = {
   defaultValueRow: 3,
   maxColumn: 'T',
   getFilePath: () => 'factory/data.json',
-  feParser: (data: any[]) => {
+  feParser: async (data: any[]) => {
     return data.map((row, id) => {
       const supplies = getAllCellsByType(row, 'supplies').filter(item => item.value.length > 0).map(item => {
         return item.value.map(v => {

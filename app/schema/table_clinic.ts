@@ -11,7 +11,7 @@ const clinicTable: TableConfig = {
   defaultValueRow: 4,
   maxColumn: 'H',
   getFilePath: () => 'clinic/data.json',
-  feParser: (data: any[]) => {
+  feParser: async (data: any[]) => {
     return data.map((row, id) => {
       const typeValue = getCellByName(row, '类型').value;
       let type = '';

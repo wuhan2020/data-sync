@@ -15,7 +15,7 @@ const hospitalTable: TableConfig = {
   preTable: oxbridgeHospitalTable,
   preTableDetect: row => getCellByName(row, '医院名称'),
   getFilePath: (sheet: string) => `hospital/hubei/${pinyin(sheet, { style: pinyin.STYLE_NORMAL }).join('')}.json`,
-  feParser: (data: any[], sheet: string) => {
+  feParser: async (data: any[], sheet: string) => {
     return data.map((row, id) => {
       try {
         return {
