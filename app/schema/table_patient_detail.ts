@@ -97,13 +97,13 @@ const patientDetailTable: TableConfig = {
       return ctx.app.datacache.getDataByKey(addr);
     };
     res = res.filter(row => row.status === '已审核');
-    await Promise.all(res.map(async item => {
+    for (const item of res) {
       const confirmHospital = sheetName + item.confirmHospital;
       item.confirmHospital = {
         addr: item.confirmHospital,
         coord: await getCoord(confirmHospital),
       };
-    }));
+    }
     return res;
   },
   validation: () => true,
