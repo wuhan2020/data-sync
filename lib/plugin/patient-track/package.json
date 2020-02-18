@@ -1,0 +1,13 @@
+{
+  "name": "patient-track",
+  "version": "0.0.1",
+  "description": "Patient track singleton",
+  "eggPlugin" : {
+    "name": "patientTrack"
+  },
+  "keywords": [
+    "egg"
+  ],
+  "author": "frank-zsy",
+  "license": "MIT"
+}

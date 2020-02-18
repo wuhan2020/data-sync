@@ -3,7 +3,7 @@ import { Subscription } from 'egg';
 export default class UpdateShimo extends Subscription {
   static get schedule() {
     return {
-      interval: '15m',
+      interval: '2h',
       type: 'worker', // only one worker needed
       immediate: true, // update on start
     };

@@ -5,7 +5,7 @@ import { Context } from 'egg';
 const patientDetailTable: TableConfig = {
   guid: '6QQ3j8DKDqtCwyDV',
   indexKey: 'patient_detail',
-  sheets: [ '18广西', '1安徽', '2河南', '3浙江', '4江苏', '5广东', '7上海', '8河北', '9陕西', '11山东', '12山西', '13重庆', '14福建', '15天津', '16云南', '21辽宁', '23内蒙古', '25甘肃', '32香港' ],
+  sheets: [ '18广西', '1安徽', '2河南', '3浙江', '4江苏', '5广东', '11山东', '13重庆', '14福建', '15天津', '16云南', '17四川', '21辽宁', '23内蒙古', '24贵州', '25甘肃', '32香港', '33澳门' ],
   skipRows: 3,
   skipColumns: 0,
   nameRow: 3,
@@ -70,7 +70,8 @@ const patientDetailTable: TableConfig = {
         }
         addTravelAndEventData(current, row);
       } catch (e) {
-        console.log(e);
+        ctx.logger.error(row);
+        ctx.logger.error(e);
       }
     });
     const getCoord = async (addr: string): Promise<any> => {
@@ -104,6 +105,7 @@ const patientDetailTable: TableConfig = {
         coord: await getCoord(confirmHospital),
       };
     }
+    ctx.app.patientTrack.setData(res);
     return res;
   },
   validation: () => true,

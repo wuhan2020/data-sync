@@ -49,7 +49,7 @@ export default class DataFormatService extends Service {
       const i = formatter(cell);
       return i ? i : cell;
     } catch (e) {
-      this.logger.error(`table[guid:${tableConfig.guid}, indexKey:${tableConfig.indexKey}]:row[${rowNum}]:cell[${cellNum}]:err:[${e.message}]`);
+      this.logger.error(`table error, guid:${tableConfig.guid}, sheet:${sheetName}, row:${tableConfig.skipRows + rowNum + 1}, cell:${tableConfig.skipColumns + cellNum + 1}], err: ${e.message}`);
       this.errorInfo.push({
         guid: tableConfig.guid,
         sheetName,

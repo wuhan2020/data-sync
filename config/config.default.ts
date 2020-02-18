@@ -99,6 +99,10 @@ export default (appInfo: EggAppInfo) => {
     agent: false,
   };
 
+  config.patientTrack = {
+    client: {},
+  };
+
   // the return config will combines to EggAppConfig
   return {
     ...config,

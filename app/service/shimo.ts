@@ -4,11 +4,12 @@ import { TableConfig, defaultColumnType, PreTableConfig, RowData, SheetData, Tab
 
 export default class ShimoService extends Service {
 
-  private baseUrl = 'https://api.shimo.im';
+  private baseUrl = 'https://shimo.im';
+  private tokenBaseUrl = 'https://api.shimo.im';
   private rowBatch = 100;
   private maxRetryTime = 10;
   private retryDelayTime = 2000;
-  private requestTimeout = 30000;
+  private requestTimeout = 60000;
   private token: string;
 
   public async update() {
@@ -62,7 +63,7 @@ export default class ShimoService extends Service {
       const config = this.ctx.app.config.shimo;
       const options = {
         method: 'POST',
-        url: `${this.baseUrl}/oauth/token`,
+        url: `${this.tokenBaseUrl}/oauth/token`,
         headers: {
           authorization: `Basic ${Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64')}`,
           'content-type': 'application/x-www-form-urlencoded',
@@ -227,7 +228,7 @@ export default class ShimoService extends Service {
     return new Promise((resolve, reject) => {
       const options = {
         method: 'GET',
-        url: `${this.baseUrl}/files/${guid}/sheets/values`,
+        url: `${this.baseUrl}/api/sas/files/${guid}/sheets/values`,
         qs: {
           range,
         },
