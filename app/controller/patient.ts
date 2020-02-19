@@ -15,7 +15,7 @@ export default class PatientDetailController extends Controller {
       const lat = parseFloat(latitude[0]);
       const long = parseFloat(longitude[0]);
       const dis = parseFloat(distance[0]);
-      let points = this.app.patientTrack.getPoints(lat, long, dis);
+      let points = this.app.patientTrack.getPoints(lat, long, dis).filter(i => i.name !== '');
       points = points.sort((a, b) => a.distance - b.distance);
 
       const province = points.find(i => typeof i.province === 'string' && i.province !== '')?.province ?? '';
@@ -50,6 +50,10 @@ export default class PatientDetailController extends Controller {
       };
       return;
     }
+  }
+
+  public async all() {
+    this.ctx.body = this.app.patientTrack.getAllPoints();
   }
 
 }

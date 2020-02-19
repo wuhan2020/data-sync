@@ -60,7 +60,16 @@ export default class PatientTrack {
     this.setData(points);
   }
 
+  public clearData() {
+    this.points.clear();
+  }
+
   public setData(data: RawData[]) {
+    this.clearData();
+    this.addData(data);
+  }
+
+  public addData(data: RawData[]) {
     const now = new Date().getTime();
     data.forEach((line: RawData) => {
       if (!this.points.has(line.confirmHospital.addr)) {
@@ -116,6 +125,10 @@ export default class PatientTrack {
   public getCityPoints(city: string): Point[] {
     this.app.logger.info(`Gonna get data for city=${city}`);
     return Array.from(this.points.values()).filter(p => p.city === city);
+  }
+
+  public getAllPoints(): Point[] {
+    return Array.from(this.points.values());
   }
 
   private async get(url: string): Promise<any> {

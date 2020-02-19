@@ -26,6 +26,7 @@ export default class ShimoService extends Service {
     const indexFiles = {};
     const dataCount: any[] = [];
     const errorInfo: any[] = [];
+    this.app.patientTrack.clearData();
     for (const table of tables) {
       if (!indexFiles[table.indexKey]) {
         indexFiles[table.indexKey] = [];

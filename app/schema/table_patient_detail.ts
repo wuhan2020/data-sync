@@ -105,7 +105,7 @@ const patientDetailTable: TableConfig = {
         coord: await getCoord(confirmHospital),
       };
     }
-    ctx.app.patientTrack.setData(res);
+    ctx.app.patientTrack.addData(res);
     return res;
   },
   validation: () => true,
