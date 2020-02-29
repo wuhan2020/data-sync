@@ -9,7 +9,7 @@ const logisticalTable: TableConfig = {
   nameRow: 2,
   typeRow: 3,
   defaultValueRow: 4,
-  maxColumn: 'J',
+  maxColumn: 'S',
   getFilePath: () => 'logistical/data.json',
   feParser: async (data: any[]) => {
     return data.map((row, id) => {
@@ -21,8 +21,16 @@ const logisticalTable: TableConfig = {
         contacts: getCellByType(row, 'contact').value,
         date: getCellByType(row, 'date').value,
         allowPersonal: getCellByName(row, '是否接受个人捐赠').value,
-        url: getCellByType(row, 'url').value,
+        url: getCellByName(row, '发布链接').value,
         remark: getCellByName(row, '备注').value,
+        area: getCellByName(row, '物流区域').value,
+        telRemark: getCellByName(row, '电话备注').value,
+        website: getCellByName(row, '官网网址').value,
+        orderUrl: getCellByName(row, '下单地址').value,
+        customService: getCellByName(row, '在线客服网址').value,
+        noticeTitle: getCellByName(row, '公告文本标题').value,
+        noticeContent: getCellByName(row, '公告文本').value,
+        greenPath: getCellByName(row, '绿色通道').value,
       };
     });
   },
