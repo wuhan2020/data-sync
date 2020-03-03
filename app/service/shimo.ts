@@ -113,8 +113,14 @@ export default class ShimoService extends Service {
     const minCol = this.getColumnName(table.skipColumns + 1);
     const maxCol = table.maxColumn;
     const firstSheet = table.sheets[0];
-    const types = (await this.getSheetContentRange(this.token, table.guid,
-      `${firstSheet}!${minCol}${table.typeRow}:${maxCol}${table.typeRow}`))[0];
+    let types_inner;
+    if (table.typeRow > 0) {
+      types_inner = (await this.getSheetContentRange(this.token, table.guid,
+        `${firstSheet}!${minCol}${table.typeRow}:${maxCol}${table.typeRow}`))[0];
+    } else {
+      types_inner = new Array(maxCol.charCodeAt(0) - minCol.charCodeAt(0) + 1);
+    }
+    const types = types_inner;
     const names = (await this.getSheetContentRange(this.token, table.guid,
       `${firstSheet}!${minCol}${table.nameRow}:${maxCol}${table.nameRow}`))[0];
     let defaultValues: any[] = [];
